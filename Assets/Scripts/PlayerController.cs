@@ -9,7 +9,6 @@ Description
 
 */
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -36,6 +35,16 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("How strong the gravity that affects the player is")]
     [SerializeField] private float gravityForce;
+
+    [Header("Ground Checking")]
+    [Tooltip("The difference between the ground and the player")]
+    [SerializeField] private float groundOffset;
+
+    [Tooltip("The layermask the ground is on")]
+    [SerializeField] private LayerMask GroundLayers;
+
+    [Tooltip("The radius the ground will check out. best practice is to keep it at most the radius of the character controller")]
+    [SerializeField] private float GroundedRadius;
     //private variables
     
     //
@@ -56,6 +65,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 currentDirVelocity = Vector2.zero;
     //
     private float maxSpeed = 53.0f;
+    //
+    private float currentGravity;
+    //
+    private float yVelocity;
+    //
+    private bool grounded = false;
+    //
+    private bool isJumping = false;
 
 
     // Start is called before the first frame update
@@ -65,18 +82,31 @@ public class PlayerController : MonoBehaviour
         CharCon = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        currentGravity = gravityForce;
+        yVelocity = 0f;
     }
 
 
     // Update is called once per frame
     void Update()
     {
+        UpdateGround();
         UpdateCameraRotation();
         UpdateMovement();
-        ApplyGravity();
         
     }
+    private void FixedUpdate()
+    {
+        ApplyGravity();
+    }
 
+
+    private void UpdateGround()
+    {
+        Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
+        grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -100,13 +130,22 @@ public class PlayerController : MonoBehaviour
     private void UpdateMovement()
     {
         currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);
-        Vector3 velocity = ((transform.forward * currentDir.y) + (transform.right * currentDir.x)) * speed + (Vector3.up * 0);
+        Vector3 velocity = ((transform.forward * currentDir.y) + (transform.right * currentDir.x)) * speed + (Vector3.up * yVelocity);
         CharCon.Move(velocity * Time.deltaTime);
+/*        print(yVelocity);
+        print(currentGravity);*/
     }
 
     private void ApplyGravity()
     {
-        CharCon.Move(new Vector3(CharCon.velocity.x,gravityForce,CharCon.velocity.z) * Time.deltaTime);
+        if (grounded && !isJumping)
+        {
+            yVelocity = 0;
+        }
+        else
+        {
+            yVelocity += gravityForce * Time.deltaTime;
+        }
     }
 
 
@@ -122,10 +161,27 @@ public class PlayerController : MonoBehaviour
 
     private void OnJump(InputValue value)
     {
-        print("hello world");
-        //CharCon.isGrounded 
+        if(grounded)
+        {
+            print("COMPLETED");
+            isJumping = true;
+            yVelocity = jumpForce;
+            StartCoroutine(tickDownJump());
+        }
+    }
+
+    public IEnumerator tickDownJump()
+    {
+        yield return new WaitForSeconds(.1f);
+        isJumping = false;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z), GroundedRadius);
+
     }
 
     
-    
+
 }
