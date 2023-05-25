@@ -11,6 +11,7 @@ Description
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -33,6 +34,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("how strong the player jump is")]
     [SerializeField] private float jumpForce;
 
+    [Tooltip("How strong the gravity that affects the player is")]
+    [SerializeField] private float gravityForce;
     //private variables
     
     //
@@ -43,6 +46,17 @@ public class PlayerController : MonoBehaviour
     private float cameraPitch = 0f;
     //reference to the character controller
     private CharacterController CharCon;
+    // Movement
+    private Vector2 moveInput;
+    //
+    private float velocityY = 0f;
+    //
+    private Vector2 currentDir = Vector2.zero;
+    //
+    private Vector3 currentDirVelocity = Vector2.zero;
+    //
+    private float maxSpeed = 53.0f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -58,8 +72,14 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         UpdateCameraRotation();
+        UpdateMovement();
+        ApplyGravity();
+        
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void UpdateCameraRotation()
     {
         Vector2 targetMouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
@@ -73,4 +93,39 @@ public class PlayerController : MonoBehaviour
 
         transform.Rotate(Vector3.up * currentMouseDelta.x * mouseSensitivity);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void UpdateMovement()
+    {
+        currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);
+        Vector3 velocity = ((transform.forward * currentDir.y) + (transform.right * currentDir.x)) * speed + (Vector3.up * 0);
+        CharCon.Move(velocity * Time.deltaTime);
+    }
+
+    private void ApplyGravity()
+    {
+        CharCon.Move(new Vector3(CharCon.velocity.x,gravityForce,CharCon.velocity.z) * Time.deltaTime);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    private void OnMovement(InputValue value)
+    {
+        moveInput = value.Get<Vector2>();
+    }
+    
+
+    private void OnJump(InputValue value)
+    {
+        print("hello world");
+        //CharCon.isGrounded 
+    }
+
+    
+    
 }
