@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How strong the gravity that affects the player is")]
     [SerializeField] private float gravityForce;
 
+    [Tooltip("The multiplier added when the player presses shift")]
+    [SerializeField] private float speedMultiplier;
+
     [Header("Ground Checking")]
     [Tooltip("The difference between the ground and the player")]
     [SerializeField] private float groundOffset;
@@ -163,13 +166,23 @@ public class PlayerController : MonoBehaviour
     {
         if(grounded)
         {
-            print("COMPLETED");
             isJumping = true;
             yVelocity = jumpForce;
             StartCoroutine(tickDownJump());
         }
     }
 
+    private void OnSprint(InputValue value)
+    {
+        if(value.isPressed)
+        {
+            speed *= speedMultiplier;
+        }
+        else
+        {
+            speed /= speedMultiplier;
+        }
+    }
     public IEnumerator tickDownJump()
     {
         yield return new WaitForSeconds(.1f);

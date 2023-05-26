@@ -441,8 +441,9 @@ MonoBehaviour:
   mouseSensitivity: 3.5
   mouseSmoothTime: 0.03
   speed: 5
-  jumpForce: 15
+  jumpForce: 10
   gravityForce: -15
+  speedMultiplier: 3
   groundOffset: 0.8
   GroundLayers:
     serializedVersion: 2
