@@ -2,10 +2,8 @@
 Author: Craig Hughes
 Date: 5/18/2023
 
-Description
-
-
-
+Description: This holds the movement, interactions, and data of the player
+anything involving the player directly is held within this script
 
 */
 using System.Collections;
@@ -48,35 +46,48 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("The radius the ground will check out. best practice is to keep it at most the radius of the character controller")]
     [SerializeField] private float GroundedRadius;
+
+    [Header("Health")]
+    [Tooltip("How much damage the player can take before losing")]
+    [SerializeField] private int health;
+
+    [Header("Arrow stats")]
+    [Tooltip("How many arrows the player currently has")]
+    [SerializeField] private int ammo;
+
+
     //private variables
     
-    //
+    //where the mouse currently is on the screen
     private Vector2 currentMouseDelta = Vector2.zero;
-    //
+    //how fast the mouse is currently moving
     private Vector2 currentMouseDeltaVelocity = Vector2.zero;
-    //
+    //the angle at which the camera is currently oriented 
     private float cameraPitch = 0f;
     //reference to the character controller
     private CharacterController CharCon;
+
     // Movement
+    //the vector passed by the player input 
     private Vector2 moveInput;
-    //
-    private float velocityY = 0f;
-    //
+    //how fast and in what direction the player is moving on the y axis 
+    //private float velocityY = 0f;
+    //the direction the player moves on the x/z axis
     private Vector2 currentDir = Vector2.zero;
-    //
+    //the speed the player moves at on the x/z axis
     private Vector3 currentDirVelocity = Vector2.zero;
-    //
+    //the absolute fastest the player can move on the y axis
     private float maxSpeed = 53.0f;
-    //
+    //how much gravity force is currently affecting the player
     private float currentGravity;
-    //
+    //how fast and in what direction the player is moving on the y axis 
     private float yVelocity;
-    //
+    //is the player currently on the ground
     private bool grounded = false;
-    //
+    //keeps track of if the player is jumping
     private bool isJumping = false;
 
+    
 
     // Start is called before the first frame update
     void Start()
@@ -105,25 +116,29 @@ public class PlayerController : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// this creates a sphere below the player to check if the player is on the floor
+    /// if the player is on the ground then the ground variable will be set to True
+    /// otherwise it's set to False
+    /// </summary>
     private void UpdateGround()
     {
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
         grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
     }
     /// <summary>
-    /// 
+    /// This script calculates the next position of the camera based on the mouse's movement 
     /// </summary>
     private void UpdateCameraRotation()
     {
+        //get the mouse's position,desired end spot, and the player's input
         Vector2 targetMouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-
         currentMouseDelta = Vector2.SmoothDamp(currentMouseDelta, targetMouseDelta, ref currentMouseDeltaVelocity, mouseSmoothTime);
-
+        //calculate where the camera can move next
         cameraPitch -= currentMouseDelta.y * mouseSensitivity;
         cameraPitch = Mathf.Clamp(cameraPitch, -90f, 90f);
-
         CameraRef.localEulerAngles = Vector3.right * cameraPitch;
-
+        //rotate the camera towards the calculated rotation
         transform.Rotate(Vector3.up * currentMouseDelta.x * mouseSensitivity);
     }
 
@@ -135,17 +150,18 @@ public class PlayerController : MonoBehaviour
         currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);
         Vector3 velocity = ((transform.forward * currentDir.y) + (transform.right * currentDir.x)) * speed + (Vector3.up * yVelocity);
         CharCon.Move(velocity * Time.deltaTime);
-/*        print(yVelocity);
-        print(currentGravity);*/
     }
 
+    /// <summary>
+    /// this script adds or resets gravity based on where the player is in relation to the ground
+    /// </summary>
     private void ApplyGravity()
     {
-        if (grounded && !isJumping)
+        if (grounded && !isJumping)//if not jumping or is on the ground then reset gravity forces
         {
             yVelocity = 0;
         }
-        else
+        else//otherwise add the gravity that affects the player
         {
             yVelocity += gravityForce * Time.deltaTime;
         }
@@ -153,41 +169,55 @@ public class PlayerController : MonoBehaviour
 
 
     /// <summary>
-    /// 
+    /// sets the movement input to the vector that determines what direction the player
+    /// is moving in
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">the vector that the player must move in</param>
     private void OnMovement(InputValue value)
     {
         moveInput = value.Get<Vector2>();
     }
     
-
+    /// <summary>
+    /// adds a force to the player to move them up 
+    /// </summary>
+    /// <param name="value">the input of the player</param>
     private void OnJump(InputValue value)
     {
-        if(grounded)
+        if(grounded)//if not already jumping
         {
             isJumping = true;
             yVelocity = jumpForce;
-            StartCoroutine(tickDownJump());
+            StartCoroutine(tickDownJump());//prevents desynchronization of jumping
         }
     }
 
+    /// <summary>
+    /// turns spprinting on and off when the player presses the sprint button
+    /// </summary>
+    /// <param name="value">a bool that determines if the button is being pressed or unpressed</param>
     private void OnSprint(InputValue value)
     {
-        if(value.isPressed)
+        if(value.isPressed)//add sprint
         {
             speed *= speedMultiplier;
         }
-        else
+        else//remove sprint
         {
             speed /= speedMultiplier;
         }
     }
+    /// <summary>
+    /// a coroutine that prevents the player from not being able to jump
+    /// by delaying when they can jump again
+    /// </summary>
+    /// <returns> .1 seconds </returns>
     public IEnumerator tickDownJump()
     {
         yield return new WaitForSeconds(.1f);
         isJumping = false;
     }
+
 
     private void OnDrawGizmos()
     {
