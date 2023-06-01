@@ -14,6 +14,8 @@ public class ArrowBehaviour : MonoBehaviour
     private bool hasCollided;
     //reference to the rigidbody
     private Rigidbody rb;
+    //
+    private Transform finalTransform;
 
     // Start is called before the first frame update
     void Start()
@@ -27,11 +29,29 @@ public class ArrowBehaviour : MonoBehaviour
     {
         //transform.rotation = Quaternion.LookRotation(rb.velocity);
     }
+    private void FixedUpdate()
+    {
+        if(!hasCollided)
+        {
+            transform.rotation = Quaternion.LookRotation(rb.velocity);
+        }
+        else
+        {
+            rb.velocity = Vector3.zero;
+        }
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
-        hasCollided = true;
-        rb.constraints = RigidbodyConstraints.FreezeAll;
+        if(!collision.gameObject.tag.Equals("Arrow"))
+        {
+            hasCollided = true;
+            rb.freezeRotation = true;
+            rb.useGravity = false;
+            //rb.isKinematic = true;
+
+        }
+
     }
 
     public void setArrowType(int type)

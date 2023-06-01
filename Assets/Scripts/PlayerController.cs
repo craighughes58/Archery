@@ -271,9 +271,7 @@ public class PlayerController : MonoBehaviour
         {
             if(ammo > 0)
             {
-                CurrentArrow = Instantiate(Arrow, ShootFrom.position,Arrow.transform.rotation);
-                print(CurrentArrow.transform.rotation);
-
+                CurrentArrow = Instantiate(Arrow, ShootFrom.position,CameraRef.rotation);
                 CurrentArrow.GetComponent<Rigidbody>().velocity = CameraRef.forward  * (currentArrowForce * maxArrowForce);
                 currentArrowForce = 0f;
                 ammo--;

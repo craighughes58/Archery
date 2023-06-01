@@ -220,7 +220,7 @@ Transform:
   m_GameObject: {fileID: 461174482}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 1, z: 10}
+  m_LocalScale: {x: 10, y: 0.1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -482,7 +482,7 @@ MonoBehaviour:
   GroundedRadius: 0.3
   health: 5
   ammo: 15
-  maxArrowForce: 10
+  maxArrowForce: 15
   Arrow: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
   ShootFrom: {fileID: 711009615}
 --- !u!114 &760968205
