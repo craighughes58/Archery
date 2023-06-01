@@ -55,7 +55,14 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How many arrows the player currently has")]
     [SerializeField] private int ammo;
 
+    [Tooltip("How strong your arrow can be shot")]
+    [SerializeField] private float maxArrowForce;
 
+    [Tooltip("Reference to the arropw prefab")]
+    [SerializeField] private GameObject Arrow;
+
+    [Tooltip("where the arrow will come out")]
+    [SerializeField] private Transform ShootFrom;
     //private variables
     
     //where the mouse currently is on the screen
@@ -86,6 +93,13 @@ public class PlayerController : MonoBehaviour
     private bool grounded = false;
     //keeps track of if the player is jumping
     private bool isJumping = false;
+    //
+    private float currentArrowForce;
+    //
+    private bool shotPressed = false;
+    //
+    private GameObject CurrentArrow;
+
 
     
 
@@ -99,6 +113,8 @@ public class PlayerController : MonoBehaviour
 
         currentGravity = gravityForce;
         yVelocity = 0f;
+        currentArrowForce = 0f;
+        CurrentArrow = null;
     }
 
 
@@ -217,6 +233,77 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(.1f);
         isJumping = false;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    private void OnPrimaryShoot(InputValue value)
+    {
+        LoadArrow(value, 1);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    private void OnSecondaryShoot(InputValue value)
+    {
+        LoadArrow(value,2);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="arrowNum"></param>
+    private void LoadArrow(InputValue value, int arrowNum)
+    {
+        if (value.isPressed)
+        {
+            if(ammo > 0)
+            {
+                print("Pressed" + arrowNum);
+                shotPressed = true;
+                StartCoroutine(chargeShot());
+            }
+        }
+        else
+        {
+            if(ammo > 0)
+            {
+                print("Released" + arrowNum);
+                shotPressed = false;
+                CurrentArrow = Instantiate(Arrow, ShootFrom.position, ShootFrom.rotation);
+                CurrentArrow.GetComponent<Rigidbody>().velocity = CameraRef.forward  * (currentArrowForce * maxArrowForce);
+                currentArrowForce = 0f;
+                ammo--;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator chargeShot()
+    {
+        while(shotPressed)
+        {
+            if(currentArrowForce < 1f)
+            {
+                currentArrowForce += Time.deltaTime;
+            }
+            yield return new WaitForSeconds(.01f);
+
+        }
+    }
+
+
+
+
+
+
 
 
     private void OnDrawGizmos()
