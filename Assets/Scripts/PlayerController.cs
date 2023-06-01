@@ -263,7 +263,6 @@ public class PlayerController : MonoBehaviour
         {
             if(ammo > 0)
             {
-                print("Pressed" + arrowNum);
                 shotPressed = true;
                 StartCoroutine(chargeShot());
             }
@@ -272,9 +271,9 @@ public class PlayerController : MonoBehaviour
         {
             if(ammo > 0)
             {
-                print("Released" + arrowNum);
-                shotPressed = false;
-                CurrentArrow = Instantiate(Arrow, ShootFrom.position, ShootFrom.rotation);
+                CurrentArrow = Instantiate(Arrow, ShootFrom.position,Arrow.transform.rotation);
+                print(CurrentArrow.transform.rotation);
+
                 CurrentArrow.GetComponent<Rigidbody>().velocity = CameraRef.forward  * (currentArrowForce * maxArrowForce);
                 currentArrowForce = 0f;
                 ammo--;

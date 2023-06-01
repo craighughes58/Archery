@@ -482,8 +482,8 @@ MonoBehaviour:
   GroundedRadius: 0.3
   health: 5
   ammo: 15
-  maxArrowForce: 50
-  Arrow: {fileID: 716666217324558887, guid: 3c8cc7db28214524985ff6c8f1cc362a, type: 3}
+  maxArrowForce: 10
+  Arrow: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
   ShootFrom: {fileID: 711009615}
 --- !u!114 &760968205
 MonoBehaviour:
