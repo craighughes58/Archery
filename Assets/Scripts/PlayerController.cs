@@ -63,6 +63,9 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("where the arrow will come out")]
     [SerializeField] private Transform ShootFrom;
+
+    [Tooltip("How much distance the player can cover while grappled")]
+    [SerializeField] private float maxGrappleSpeed;
     //private variables
     
     //where the mouse currently is on the screen
@@ -99,6 +102,10 @@ public class PlayerController : MonoBehaviour
     private bool shotPressed = false;
     //
     private GameObject CurrentArrow;
+    //
+    private LineRenderer lr;
+    //
+    private bool isGrappled;
 
 
     
@@ -108,6 +115,7 @@ public class PlayerController : MonoBehaviour
     {
         //set all variables
         CharCon = GetComponent<CharacterController>();
+        lr = GetComponent<LineRenderer>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -115,6 +123,8 @@ public class PlayerController : MonoBehaviour
         yVelocity = 0f;
         currentArrowForce = 0f;
         CurrentArrow = null;
+        isGrappled = false;
+        
     }
 
 
@@ -129,6 +139,35 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         ApplyGravity();
+        CheckGrappleArrow();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void CheckGrappleArrow()
+    {
+        lr.SetPosition(0, transform.position);
+        lr.SetPosition(1, transform.position);
+        if (CurrentArrow != null && CurrentArrow.GetComponent<ArrowBehaviour>().GetArrowType() == 1)
+        {
+            lr.SetPosition(0, ShootFrom.position);
+            lr.SetPosition(1, CurrentArrow.transform.position);
+            if (CurrentArrow.GetComponent<ArrowBehaviour>().GetCollided())//AND NOT COLLIDED WITH YET 
+            {
+                isGrappled = true;
+
+                Vector3 offset = CurrentArrow.transform.position - transform.position;
+
+                if (offset.magnitude > .1f)
+                {
+                    offset = offset.normalized * maxGrappleSpeed;
+                    CharCon.Move(offset * Time.deltaTime);
+                }
+
+                //transform.position = Vector3.MoveTowards(transform.position, CurrentArrow.transform.position, maxGrappleSpeed);
+            }
+        }
     }
 
 
@@ -173,7 +212,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void ApplyGravity()
     {
-        if (grounded && !isJumping)//if not jumping or is on the ground then reset gravity forces
+        if (grounded && !isJumping || isGrappled)//if not jumping or is on the ground then reset gravity forces
         {
             yVelocity = 0;
         }
@@ -200,8 +239,14 @@ public class PlayerController : MonoBehaviour
     /// <param name="value">the input of the player</param>
     private void OnJump(InputValue value)
     {
-        if(grounded)//if not already jumping
+        if(grounded || isGrappled)//if not already jumping
         {
+            if (isGrappled)
+            {
+                //add forward force
+                CurrentArrow = null;
+                isGrappled = false;
+            }
             isJumping = true;
             yVelocity = jumpForce;
             StartCoroutine(tickDownJump());//prevents desynchronization of jumping
@@ -240,7 +285,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="value"></param>
     private void OnPrimaryShoot(InputValue value)
     {
-        LoadArrow(value, 1);
+        LoadArrow(value, 0);
     }
 
     /// <summary>
@@ -249,7 +294,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="value"></param>
     private void OnSecondaryShoot(InputValue value)
     {
-        LoadArrow(value,2);
+        LoadArrow(value,1);
     }
 
     /// <summary>
@@ -271,8 +316,10 @@ public class PlayerController : MonoBehaviour
         {
             if(ammo > 0)
             {
+                isGrappled = false;
                 CurrentArrow = Instantiate(Arrow, ShootFrom.position,CameraRef.rotation);
                 CurrentArrow.GetComponent<Rigidbody>().velocity = CameraRef.forward  * (currentArrowForce * maxArrowForce);
+                CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(arrowNum);
                 currentArrowForce = 0f;
                 ammo--;
             }

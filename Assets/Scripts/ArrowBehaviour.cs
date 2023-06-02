@@ -58,6 +58,10 @@ public class ArrowBehaviour : MonoBehaviour
     {
         arrowType = type;
     }
+    public int GetArrowType()
+    {
+        return arrowType;
+    }
     public bool GetCollided()
     {
         return hasCollided;
