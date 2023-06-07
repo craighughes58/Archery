@@ -483,10 +483,12 @@ MonoBehaviour:
   GroundedRadius: 0.3
   health: 5
   ammo: 15
-  maxArrowForce: 15
+  maxArrowForce: 20
   Arrow: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
   ShootFrom: {fileID: 711009615}
-  maxGrappleSpeed: 5
+  maxGrappleSpeed: 10
+  GrappleLaunchOffset: {x: 0.25, y: 1}
+  GrappleLaunchForce: 1.75
 --- !u!114 &760968205
 MonoBehaviour:
   m_ObjectHideFlags: 0
