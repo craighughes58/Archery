@@ -66,6 +66,12 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("How much distance the player can cover while grappled")]
     [SerializeField] private float maxGrappleSpeed;
+
+    [Tooltip("How far off from the arrow that the player will be launched up and pushed forward. x will change the y and y will change the z")]
+    [SerializeField] private Vector2 GrappleLaunchOffset;
+
+    [Tooltip("This will affect how strong the jump is when you launch off a grapple")]
+    [SerializeField, Range(0,10)] private float GrappleLaunchForce;
     //private variables
     
     //where the mouse currently is on the screen
@@ -106,6 +112,8 @@ public class PlayerController : MonoBehaviour
     private LineRenderer lr;
     //
     private bool isGrappled;
+    //
+    private Vector3 BoostVector;
 
 
     
@@ -124,6 +132,7 @@ public class PlayerController : MonoBehaviour
         currentArrowForce = 0f;
         CurrentArrow = null;
         isGrappled = false;
+        BoostVector = Vector3.zero;
         
     }
 
@@ -203,7 +212,7 @@ public class PlayerController : MonoBehaviour
     private void UpdateMovement()
     {
         currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);
-        Vector3 velocity = ((transform.forward * currentDir.y) + (transform.right * currentDir.x)) * speed + (Vector3.up * yVelocity);
+        Vector3 velocity = ((transform.forward * (currentDir.y + BoostVector.z)) + (transform.right * (currentDir.x + BoostVector.x))) * speed + (Vector3.up * (yVelocity + BoostVector.y));
         CharCon.Move(velocity * Time.deltaTime);
     }
 
@@ -215,6 +224,7 @@ public class PlayerController : MonoBehaviour
         if (grounded && !isJumping || isGrappled)//if not jumping or is on the ground then reset gravity forces
         {
             yVelocity = 0;
+            BoostVector = Vector3.zero;
         }
         else//otherwise add the gravity that affects the player
         {
@@ -243,6 +253,7 @@ public class PlayerController : MonoBehaviour
         {
             if (isGrappled)
             {
+                PullPlayer(CurrentArrow.transform);
                 //add forward force
                 CurrentArrow = null;
                 isGrappled = false;
@@ -341,6 +352,37 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(.01f);
 
         }
+    }
+
+
+
+    public void AddHealth()
+    {
+
+    }
+
+    public void AddAmmo()
+    {
+
+    }
+
+    public void PullPlayer(Transform pullPoint)
+    {
+        if (pullPoint.position.y + 2f > transform.position.y)
+        {
+            yVelocity = 0f;
+            BoostVector.y = Mathf.Sqrt(((pullPoint.position.y + GrappleLaunchOffset.x) - transform.position.y) * -GrappleLaunchForce * gravityForce);
+            BoostVector.z = GrappleLaunchOffset.y;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnCollisionEnter(Collision collision)
+    {
+        
     }
 
 
