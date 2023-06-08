@@ -12,7 +12,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    //public variables
+    #region Private variables
+    //public variables --did not remove label as I am not sure if change is intended later on, MKE
     [Header("Camera Variables")]
     [Tooltip("Reference to the transform of the camera that is attached to the player")]
     [SerializeField] private Transform CameraRef;
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("The amount of smoothing when the player starts and stops looking around with the mouse")]
     [SerializeField] [Range(0.0f, 0.5f)] float mouseSmoothTime = 0.03f;
 
+    #region Serialized Movement Variables
     [Header("Movement")]
 
     [Tooltip("How fast the player can move")]
@@ -46,11 +48,13 @@ public class PlayerController : MonoBehaviour
 
     [Tooltip("The radius the ground will check out. best practice is to keep it at most the radius of the character controller")]
     [SerializeField] private float GroundedRadius;
+    #endregion
 
     [Header("Health")]
     [Tooltip("How much damage the player can take before losing")]
     [SerializeField] private int health;
 
+    #region Serialized Arrow Variables
     [Header("Arrow stats")]
     [Tooltip("How many arrows the player currently has")]
     [SerializeField] private int ammo;
@@ -58,7 +62,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How strong your arrow can be shot")]
     [SerializeField] private float maxArrowForce;
 
-    [Tooltip("Reference to the arropw prefab")]
+    [Tooltip("Reference to the arrow prefab")]
     [SerializeField] private GameObject Arrow;
 
     [Tooltip("where the arrow will come out")]
@@ -73,7 +77,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("This will affect how strong the jump is when you launch off a grapple")]
     [SerializeField, Range(0,10)] private float GrappleLaunchForce;
     //private variables
-    
+    #endregion
+
     //where the mouse currently is on the screen
     private Vector2 currentMouseDelta = Vector2.zero;
     //how fast the mouse is currently moving
@@ -83,6 +88,7 @@ public class PlayerController : MonoBehaviour
     //reference to the character controller
     private CharacterController CharCon;
 
+    #region Non-Serialized Movement variables
     // Movement
     //the vector passed by the player input 
     private Vector2 moveInput;
@@ -103,6 +109,9 @@ public class PlayerController : MonoBehaviour
     //keeps track of if the player is jumping
     private bool isJumping = false;
     //
+    #endregion
+
+    #region Non-Serialized Arrow variables 
     private float currentArrowForce;
     //
     private bool shotPressed = false;
@@ -115,8 +124,9 @@ public class PlayerController : MonoBehaviour
     //
     private Vector3 BoostVector;
 
+    #endregion
 
-    
+    #endregion
 
     // Start is called before the first frame update
     void Start()
