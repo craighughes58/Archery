@@ -6,6 +6,7 @@ Description: This holds the movement, interactions, and data of the player
 anything involving the player directly is held within this script
 
 */
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -54,10 +55,16 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How much damage the player can take before losing")]
     [SerializeField] private int health;
 
+    [Tooltip("How much health can the player hold at one time")]
+    [SerializeField] private int healthMax;
+
     #region Serialized Arrow Variables
     [Header("Arrow stats")]
     [Tooltip("How many arrows the player currently has")]
     [SerializeField] private int ammo;
+
+    [Tooltip("How many arrows can the palyer hold at one time")]
+    [SerializeField] private int ammoMax;
 
     [Tooltip("How strong your arrow can be shot")]
     [SerializeField] private float maxArrowForce;
@@ -365,15 +372,55 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
-    public void AddHealth()
+    /// <summary>
+    /// function to process a healing request. Returns a bool to indicate whether health was added
+    /// </summary>
+    /// <returns></returns>
+    public bool AddHealth(int healthAdd)
     {
-
+        if (health == healthMax)
+        {
+            //Debug.Log("AddHealth called - health already full");
+            return false;
+        }
+        else if (health + healthAdd > healthMax)
+        {
+            health = healthMax;
+            //Debug.Log("AddHealth called - health maxed out");
+            return true;
+        }
+        else
+        {
+            health += healthAdd;
+            //Debug.Log("AddHealth called - health now" + health);
+            return true;
+        }
     }
 
-    public void AddAmmo()
+    /// <summary>
+    /// function to process an ammo reload request. Returns a boolean to indicate whether ammo was added
+    /// </summary>
+    /// <returns></returns>
+    public bool AddAmmo(int ammoAdd)
     {
+        if (ammo == ammoMax)
+        {
+            //Debug.Log("AddAmmo called - ammo already full");
+            return false;
+        }
+        else if (ammo + ammoAdd >= ammoMax)
+        {
+            ammo = ammoMax;
+            //Debug.Log("AddAmmo called - ammo maxed out");
+            return true;
+        }
+        else
+        {
 
+            ammo += ammoAdd;
+            Debug.Log("AddAmmo called - ammo now " + ammo);
+            return true;
+        }
     }
 
     public void PullPlayer(Transform pullPoint)
