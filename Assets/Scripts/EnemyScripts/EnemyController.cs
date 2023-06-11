@@ -37,13 +37,13 @@ public  class EnemyController : MonoBehaviour
     [Header("Movement")]
 
     [Tooltip("How fast the enemy can move")]
-    [SerializeField] private float speed;
+    [SerializeField] private float speed = 1;
 
     [Tooltip("how strong the enemy jump is")]
-    [SerializeField] private float jumpForce;
+    [SerializeField] private float jumpForce = 1;
 
     [Tooltip("How strong the gravity that affects the enemy is")]
-    [SerializeField] private float gravityForce;
+    [SerializeField] private float gravityForce = 1;
 
     [Tooltip("The multiplier added when the enemy gains speeed")]
     [SerializeField] private float speedMultiplier;
