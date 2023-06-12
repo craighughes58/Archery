@@ -40,30 +40,42 @@ public class EnemyAIBase : MonoBehaviour
     private NavMeshAgent NavAgent;
     private int PatrolIndex = 0;
 
-    private float NextTime;
-    private Transform Destination;
+    private float TimeLeft;
+
+    private EnemyController EnemyController;
 
     #endregion
 
     // Start is called before the first frame update
     void Start()
     {
+        EnemyController = GetComponent<EnemyController>();
+
         NavAgent = GetComponent<NavMeshAgent>();
         NavAgent.autoBraking = false;
-
-        Destination = this.gameObject.transform;
+        NavAgent.speed = EnemyController.speed;
         NextPatrolPoint();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //are we at the destination? have we completed our delay time?
-        if (Time.time > NextTime && this.gameObject.transform.position == Destination.position)
+        if (NavAgent.remainingDistance < .5)
         {
-            NextPatrolPoint();
+            if (TimeLeft == 0 || TimeLeft < 0)
+            {
+                NextPatrolPoint();
 
+
+            }
+            else
+            {
+                TimeLeft -= 1 * Time.deltaTime;
+            }
         }
+        
+
+       
 
     }
 
@@ -93,12 +105,10 @@ public class EnemyAIBase : MonoBehaviour
             Duration = Random.Range(0, RandomDelayMaxTime);        
         }
 
-        NavAgent.SetDestination(PatrolPoints[PatrolIndex].transform.position);
-         Destination.position = NavAgent.destination;
+       NavAgent.SetDestination(PatrolPoints[PatrolIndex].transform.position);
         PatrolIndex++;
 
-
-        NextTime = Time.time + Duration;
+        TimeLeft = Duration;
 
         
 
