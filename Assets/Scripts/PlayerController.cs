@@ -418,7 +418,8 @@ public class PlayerController : MonoBehaviour
         {
 
             ammo += ammoAdd;
-            Debug.Log("AddAmmo called - ammo now " + ammo);
+            //
+            //+Debug.Log("AddAmmo called - ammo now " + ammo);
             return true;
         }
     }

@@ -19,7 +19,7 @@ public class PickupBase : MonoBehaviour
     [Tooltip("how fast will the pickup cycle up and down")]
     [SerializeField] protected float oscillationSpeed = 1f;
     [Tooltip("how much will the pickup bob up and down")]
-    [SerializeField] protected float oscillationMagnitude = .005f;
+    [SerializeField] protected float oscillationMagnitude = .0025f;
     [Tooltip("how rapidly will the pickup rotate")]
     [SerializeField] protected float rotationSpeed = 1f;
     [Tooltip("Oscillation offset to ensure all pickups move out of sync w/ one another")]
