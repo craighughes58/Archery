@@ -141,6 +141,7 @@ public class PlayerController : MonoBehaviour
         //set all variables
         CharCon = GetComponent<CharacterController>();
         lr = GetComponent<LineRenderer>();
+        //hide mouse
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -157,27 +158,30 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        UpdateGround();
-        UpdateCameraRotation();
-        UpdateMovement();
+        UpdateGround();//check if on the groung
+        UpdateCameraRotation();//check if moving mouse
+        UpdateMovement();//check if moving
         
     }
     private void FixedUpdate()
     {
-        ApplyGravity();
-        CheckGrappleArrow();
+        ApplyGravity();//every fixed frame apply gravity
+        CheckGrappleArrow();//check if the player is grappled
     }
 
+    #region movement
     /// <summary>
-    /// 
+    /// this script handles the line renderer attached to the grappling arrow from the player
+    /// then if a grappling arrow is out it checks if the arrow has collided with something
+    /// once the arrow has collided with something the player will rapidly  move towards it
     /// </summary>
     private void CheckGrappleArrow()
     {
-        lr.SetPosition(0, transform.position);
+        lr.SetPosition(0, transform.position);//starting points for line renderer
         lr.SetPosition(1, transform.position);
-        if (CurrentArrow != null && CurrentArrow.GetComponent<ArrowBehaviour>().GetArrowType() == 1)
+        if (CurrentArrow != null && CurrentArrow.GetComponent<ArrowBehaviour>().GetArrowType() == 1)//is grapple arrow out
         {
-            lr.SetPosition(0, ShootFrom.position);
+            lr.SetPosition(0, ShootFrom.position);//draw line to arrow
             lr.SetPosition(1, CurrentArrow.transform.position);
             if (CurrentArrow.GetComponent<ArrowBehaviour>().GetCollided())//AND NOT COLLIDED WITH YET 
             {
@@ -188,7 +192,7 @@ public class PlayerController : MonoBehaviour
                 if (offset.magnitude > .1f)
                 {
                     offset = offset.normalized * maxGrappleSpeed;
-                    CharCon.Move(offset * Time.deltaTime);
+                    CharCon.Move(offset * Time.deltaTime);//move towards thearrow
                 }
 
                 //transform.position = Vector3.MoveTowards(transform.position, CurrentArrow.transform.position, maxGrappleSpeed);
@@ -224,13 +228,14 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// This method handles all movement that affects the player in the XYZ planes
+    /// calculates velocity and direction then applies it to the playercontroller 
     /// </summary>
     private void UpdateMovement()
     {
-        currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);
-        Vector3 velocity = ((transform.forward * (currentDir.y + BoostVector.z)) + (transform.right * (currentDir.x + BoostVector.x))) * speed + (Vector3.up * (yVelocity + BoostVector.y));
-        CharCon.Move(velocity * Time.deltaTime);
+        currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);//the direction of the player 
+        Vector3 velocity = ((transform.forward * (currentDir.y + BoostVector.z)) + (transform.right * (currentDir.x + BoostVector.x))) * speed + (Vector3.up * (yVelocity + BoostVector.y));//the speed at which the player is moving
+        CharCon.Move(velocity * Time.deltaTime);//move in relation to time, direction, and speed
     }
 
     /// <summary>
@@ -268,7 +273,7 @@ public class PlayerController : MonoBehaviour
     {
         if(grounded || isGrappled)//if not already jumping
         {
-            if (isGrappled)
+            if (isGrappled)// if grappled end grapple and jump midair
             {
                 PullPlayer(CurrentArrow.transform);
                 //add forward force
@@ -307,44 +312,65 @@ public class PlayerController : MonoBehaviour
         isJumping = false;
     }
 
+
     /// <summary>
-    /// 
+    /// This method will be called if the player jumps while grappled.
+    /// This script launches the player in the direction they're looking 
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="pullPoint"></param>
+    public void PullPlayer(Transform pullPoint)
+    {
+        if (pullPoint.position.y + 2f > transform.position.y)// if they're too close it won't work
+        {
+            yVelocity = 0f;//reset gravity
+            BoostVector.y = Mathf.Sqrt(((pullPoint.position.y + GrappleLaunchOffset.x) - transform.position.y) * -GrappleLaunchForce * gravityForce);//find the disitance in a straight line between the player and the pull point
+            BoostVector.z = GrappleLaunchOffset.y;//how quick
+        }
+    }
+
+
+    #endregion
+
+    #region shooting
+    /// <summary>
+    /// This will call the basic arrow shot and load it
+    /// </summary>
+    /// <param name="value">The button pressed by the player</param>
     private void OnPrimaryShoot(InputValue value)
     {
         LoadArrow(value, 0);
     }
 
     /// <summary>
-    /// 
+    /// this will call the seconday arrow shot and load it
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">The button pressed by the player</param>
     private void OnSecondaryShoot(InputValue value)
     {
         LoadArrow(value,1);
     }
 
     /// <summary>
-    /// 
+    /// This method will call the charge shot coroutine when an arrow isn't already knocked
+    /// then if the arrow is knocked already, it will create and shoot an arrow
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="arrowNum"></param>
+    /// <param name="value">The button pressed by the player</param>
+    /// <param name="arrowNum">0 = normal, 1 = grapple</param>
     private void LoadArrow(InputValue value, int arrowNum)
     {
-        if (value.isPressed)
+        if (value.isPressed)// if the arrow is  pressed and has ammo left
         {
             if(ammo > 0)
             {
                 shotPressed = true;
-                StartCoroutine(chargeShot());
+                StartCoroutine(chargeShot()); //start charging the arrow
             }
         }
-        else
+        else//if the arrow is pressed and has ammo elft
         {
             if(ammo > 0)
             {
-                isGrappled = false;
+                isGrappled = false;//shoot the arrow
                 CurrentArrow = Instantiate(Arrow, ShootFrom.position,CameraRef.rotation);
                 CurrentArrow.GetComponent<Rigidbody>().velocity = CameraRef.forward  * (currentArrowForce * maxArrowForce);
                 CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(arrowNum);
@@ -355,14 +381,15 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// while the shot is pressed, add the time held down until it reaches a ceiling
+    /// this float will be used to modify the arrow's speed
     /// </summary>
     /// <returns></returns>
     public IEnumerator chargeShot()
     {
         while(shotPressed)
         {
-            if(currentArrowForce < 1f)
+            if(currentArrowForce < 1f)//ceiling
             {
                 currentArrowForce += Time.deltaTime;
             }
@@ -370,8 +397,9 @@ public class PlayerController : MonoBehaviour
 
         }
     }
+    #endregion
 
-
+    #region pickups
     /// <summary>
     /// function to process a healing request. Returns a bool to indicate whether health was added
     /// </summary>
@@ -424,16 +452,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void PullPlayer(Transform pullPoint)
-    {
-        if (pullPoint.position.y + 2f > transform.position.y)
-        {
-            yVelocity = 0f;
-            BoostVector.y = Mathf.Sqrt(((pullPoint.position.y + GrappleLaunchOffset.x) - transform.position.y) * -GrappleLaunchForce * gravityForce);
-            BoostVector.z = GrappleLaunchOffset.y;
-        }
-    }
+    #endregion
 
+    #region collisions
     /// <summary>
     /// 
     /// </summary>
@@ -442,20 +463,15 @@ public class PlayerController : MonoBehaviour
     {
         
     }
+    #endregion
 
-
-
-
-
-
-
-
+    #region gizmos
     private void OnDrawGizmos()
     {
         Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z), GroundedRadius);
 
     }
+    #endregion
 
-    
 
 }
