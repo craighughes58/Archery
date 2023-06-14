@@ -34,20 +34,7 @@ public  class EnemyController : MonoBehaviour
     #region Private variables
 
     //begin private variables
-    [Header("Movement")]
-
-    [Tooltip("How fast the enemy can move")]
-    [SerializeField] private float speed;
-
-    [Tooltip("how strong the enemy jump is")]
-    [SerializeField] private float jumpForce;
-
-    [Tooltip("How strong the gravity that affects the enemy is")]
-    [SerializeField] private float gravityForce;
-
-    [Tooltip("The multiplier added when the enemy gains speeed")]
-    [SerializeField] private float speedMultiplier;
-
+    
     [Header("Weapon & Attack Properties")]
 
     [SerializeField] private int Ammo;
@@ -61,6 +48,25 @@ public  class EnemyController : MonoBehaviour
 
 
     //end private variables
+    #endregion
+
+    #region Public Variables
+
+    [Header("Movement")]
+
+    [Tooltip("How fast the enemy can move")]
+    public float speed = 1;
+
+    [Tooltip("how strong the enemy jump is")]
+    public float jumpForce = 1;
+
+    [Tooltip("How strong the gravity that affects the enemy is")]
+    public float gravityForce = 1;
+
+    [Tooltip("The multiplier added when the enemy gains speeed")]
+    public float speedMultiplier;
+
+
     #endregion
 
     #region Methods
