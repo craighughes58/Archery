@@ -692,9 +692,9 @@ GameObject:
   - component: {fileID: 762598806}
   - component: {fileID: 762598805}
   - component: {fileID: 762598804}
-  - component: {fileID: 762598803}
   - component: {fileID: 762598802}
   - component: {fileID: 762598801}
+  - component: {fileID: 762598808}
   m_Layer: 0
   m_Name: SampleEnemy
   m_TagString: Untagged
@@ -723,6 +723,8 @@ MonoBehaviour:
   RandomPointOrder: 0
   RandomDelayTime: 0
   RandomDelayMaxTime: 9
+  PerceptionRadius: 3
+  StoppingDistance: 4
 --- !u!114 &762598802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -740,32 +742,10 @@ MonoBehaviour:
   Ammo: 0
   Damage: 0
   ShootFromLocation: {fileID: 0}
-  speed: 0
+  speed: 3.5
   jumpForce: 1
   gravityForce: 1
   speedMultiplier: 0
---- !u!195 &762598803
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 762598800}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5000001
-  m_Speed: 3.5
-  m_Acceleration: 1
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 1
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!136 &762598804
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -845,6 +825,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!195 &762598808
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762598800}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5000001
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!4 &819386739 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 409597205649327712, guid: 1d6c30c5367c5a84aa4432bfdccfbe2c, type: 3}
@@ -1013,8 +1015,8 @@ GameObject:
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_NavMeshLayer: 1
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!65 &1292787164
 BoxCollider:
@@ -1204,11 +1206,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 409597205649327712, guid: 1d6c30c5367c5a84aa4432bfdccfbe2c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.56
+      value: -4.034
       objectReference: {fileID: 0}
     - target: {fileID: 409597205649327712, guid: 1d6c30c5367c5a84aa4432bfdccfbe2c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.68
+      value: -1.149
       objectReference: {fileID: 0}
     - target: {fileID: 409597205649327712, guid: 1d6c30c5367c5a84aa4432bfdccfbe2c, type: 3}
       propertyPath: m_LocalPosition.z
