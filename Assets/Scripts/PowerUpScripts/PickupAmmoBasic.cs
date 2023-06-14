@@ -37,7 +37,7 @@ public class PickupAmmoBasic : PickupBase
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            var player = GameObject.FindObjectOfType<PlayerController>();
+            var player = other.GetComponent<PlayerController>();
             //Debug.Log("AmmoPack trigger called");
             if (player.AddAmmo(packSize)) Destroy(this.gameObject);
         }

@@ -33,7 +33,7 @@ public class PickupHealthBasic : PickupBase
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            var player = GameObject.FindObjectOfType<PlayerController>();
+            var player = other.GetComponent<PlayerController>();
             //Debug.Log("HealthPack trigger called");
             if (player.AddHealth(healthAmount)) Destroy(this.gameObject);
         }
