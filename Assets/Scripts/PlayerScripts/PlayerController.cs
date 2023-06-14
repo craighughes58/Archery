@@ -13,6 +13,15 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+
+    #region Delegate events
+    //subscribable delegate event to notify relevant parties that health is changing; currently used by UI -BMH
+    public delegate void HealthUpdate(int newHealth);
+    public static event HealthUpdate updateHealth;
+    public delegate void AmmoUpdate(int newAmmo);
+    public static event AmmoUpdate updateAmmo;
+    #endregion
+
     #region Private variables
     //public variables --did not remove label as I am not sure if change is intended later on, MKE
     [Header("Camera Variables")]
@@ -376,6 +385,7 @@ public class PlayerController : MonoBehaviour
                 CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(arrowNum);
                 currentArrowForce = 0f;
                 ammo--;
+                updateAmmo(ammo);
             }
         }
     }
@@ -409,17 +419,20 @@ public class PlayerController : MonoBehaviour
         if (health == healthMax)
         {
             //Debug.Log("AddHealth called - health already full");
+            updateHealth(health);
             return false;
         }
         else if (health + healthAdd > healthMax)
         {
             health = healthMax;
+            updateHealth(health);
             //Debug.Log("AddHealth called - health maxed out");
             return true;
         }
         else
         {
             health += healthAdd;
+            updateHealth(health);
             //Debug.Log("AddHealth called - health now" + health);
             return true;
         }
@@ -434,18 +447,20 @@ public class PlayerController : MonoBehaviour
         if (ammo == ammoMax)
         {
             //Debug.Log("AddAmmo called - ammo already full");
+            updateAmmo(ammoMax);
             return false;
         }
         else if (ammo + ammoAdd >= ammoMax)
         {
+            updateAmmo(ammoMax);
             ammo = ammoMax;
             //Debug.Log("AddAmmo called - ammo maxed out");
             return true;
         }
         else
         {
-
             ammo += ammoAdd;
+            updateAmmo(ammo);
             //
             //+Debug.Log("AddAmmo called - ammo now " + ammo);
             return true;
@@ -473,5 +488,26 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    #region Getters
+    public int getMaxHealth()
+    {
+        return healthMax;
+    }
+
+    public int getCurrHealth()
+    {
+        return health;
+    }
+
+    public int getCurrAmmo()
+    {
+        return ammo;
+    }
+
+    public int getMaxAmmo()
+    {
+        return ammoMax;
+    }
+    #endregion
 
 }

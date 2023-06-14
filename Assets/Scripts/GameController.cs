@@ -7,6 +7,12 @@ public class GameController : MonoBehaviour
     //You can access the game controller by typing GameController.Instance.VARIABLE YOU WANT 
     public static GameController Instance { get; private set;}//you can get it from other scripts but not set it 
 
+    #region Delegate events
+    //subscribable delegate event to notify relevant parties that timer is changing; currently used by UI -BMH
+    public delegate void TimerUpdate(float newTime);
+    public static event TimerUpdate updateTimer;
+    #endregion
+
     #region private variables
     //
     private int Score = 0;
@@ -60,6 +66,7 @@ public class GameController : MonoBehaviour
         while(timer > 0)
         {
             timer -= Time.deltaTime;
+            updateTimer(timer); //calls event for use by other scripts
             yield return new WaitForSeconds(Time.deltaTime);
         }
         //Activate end game procedures
