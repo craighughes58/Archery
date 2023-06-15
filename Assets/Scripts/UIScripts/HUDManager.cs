@@ -16,6 +16,9 @@ public class HUDManager : MonoBehaviour
     [Tooltip("A reference to the text box displaying game timer info")]
     [SerializeField]
     private Text timerDisplay = null;
+    [Tooltip("A reference to the charge display box")]
+    [SerializeField]
+    private Slider chargeBar = null;
     #endregion
 
     #region non-serialized private fields
@@ -49,7 +52,12 @@ public class HUDManager : MonoBehaviour
         currentAmmoVal = player.getCurrAmmo();
         ammoDisplayUpdate(currentAmmoVal, maxAmmo);
 
-        //set timer conditions in HUD
+        //set charge counter conditions in HUD
+        PlayerController.updateCharge += chargeDisplayUpdate;
+        chargeDisplayUpdate(0);
+
+
+        //set timer conditions in HUD; don't need to preset as time will get autocalled in the first frame
         GameController.updateTimer += timerDisplayChange;
     }
 
@@ -107,6 +115,20 @@ public class HUDManager : MonoBehaviour
         if (timerDisplay.text != currTime.ToString("f2"))
         {
             timerDisplay.text = currTime.ToString("f2");
+        }
+    }
+
+    void chargeDisplayUpdate(float currCharge)
+    {
+        if (currCharge <= 0)
+        {
+            chargeBar.GetComponentInParent<CanvasGroup>().alpha = 0;
+            chargeBar.value = 0;
+        }
+        else 
+        {
+            chargeBar.GetComponentInParent<CanvasGroup>().alpha = 1;
+            chargeBar.value = currCharge;
         }
     }
 
