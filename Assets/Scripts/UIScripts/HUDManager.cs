@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,16 +31,17 @@ public class HUDManager : MonoBehaviour
     private int maxAmmo = 0; //stores max arrow quiver size
     #endregion
 
-    // Start is called before the first frame update
     void Awake()
     {
         //wrangle a reference to the player for data pulling purposes
         player = GameObject.Find("Player").GetComponent<PlayerController>();
-
-
         //wrangle a reference to the GameController to subscribe to Timer data;
-        controller = GameObject.Find("GameController").GetComponent<GameController>();
+        controller = GameObject.Find("GameController").GetComponent<GameController>();        
+    }
 
+    // Start is called before the first frame update
+    void Start()
+    {
         //set health conditions in HUD
         PlayerController.updateHealth += healthBarChange;
         maxHealth = player.getMaxHealth();
@@ -56,15 +58,8 @@ public class HUDManager : MonoBehaviour
         PlayerController.updateCharge += chargeDisplayUpdate;
         chargeDisplayUpdate(0);
 
-
         //set timer conditions in HUD; don't need to preset as time will get autocalled in the first frame
         GameController.updateTimer += timerDisplayChange;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     //function to handle HUD changes to healthbar value

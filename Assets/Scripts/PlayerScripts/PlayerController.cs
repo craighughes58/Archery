@@ -11,6 +11,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Health))]
 public class PlayerController : MonoBehaviour
 {
 
@@ -61,13 +62,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("The radius the ground will check out. best practice is to keep it at most the radius of the character controller")]
     [SerializeField] private float GroundedRadius;
     #endregion
-
-    [Header("Health")]
-    [Tooltip("How much damage the player can take before losing")]
-    [SerializeField] private int health;
-
-    [Tooltip("How much health can the player hold at one time")]
-    [SerializeField] private int healthMax;
 
     #region Serialized Arrow Variables
     [Header("Arrow stats")]
@@ -138,6 +132,8 @@ public class PlayerController : MonoBehaviour
     //
     private LineRenderer lr;
     //
+    private Health healthSystem;
+    //
     private bool isGrappled;
     //
     private Vector3 BoostVector;
@@ -145,6 +141,11 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #endregion
+
+    private void Awake()
+    {
+        healthSystem = GetComponent<Health>(); //Needs to link immediately to not break HUD -BMH
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -420,24 +421,14 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     public bool AddHealth(int healthAdd)
     {
-        if (health == healthMax)
+        if (this.healthSystem.isFull())
         {
-            //Debug.Log("AddHealth called - health already full");
-            updateHealth(health);
             return false;
-        }
-        else if (health + healthAdd > healthMax)
-        {
-            health = healthMax;
-            updateHealth(health);
-            //Debug.Log("AddHealth called - health maxed out");
-            return true;
         }
         else
         {
-            health += healthAdd;
-            updateHealth(health);
-            //Debug.Log("AddHealth called - health now" + health);
+            this.healthSystem.heal(healthAdd);
+            updateHealth(healthSystem.getCurrentHealth());
             return true;
         }
     }
@@ -493,25 +484,9 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Getters
-    public int getMaxHealth()
-    {
-        return healthMax;
-    }
-
-    public int getCurrHealth()
-    {
-        return health;
-    }
-
-    public int getCurrAmmo()
-    {
-        return ammo;
-    }
-
-    public int getMaxAmmo()
-    {
-        return ammoMax;
-    }
+    public int getMaxHealth() { return this.healthSystem.getMaximumHealth(); }
+    public int getCurrHealth() { return this.healthSystem.getCurrentHealth(); }
+    public int getCurrAmmo() { return ammo; }
+    public int getMaxAmmo() { return ammoMax; }
     #endregion
-
 }
