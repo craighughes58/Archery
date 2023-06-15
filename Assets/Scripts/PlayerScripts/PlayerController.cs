@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     public static event HealthUpdate updateHealth;
     public delegate void AmmoUpdate(int newAmmo);
     public static event AmmoUpdate updateAmmo;
+    public delegate void ChargeUpdate(float newCharge);
+    public static event ChargeUpdate updateCharge;
     #endregion
 
     #region Private variables
@@ -376,9 +378,11 @@ public class PlayerController : MonoBehaviour
             }
         }
         else//if the arrow is pressed and has ammo elft
-        {
+        {                
+            updateCharge(0);
             if(ammo > 0)
             {
+                shotPressed = false;
                 isGrappled = false;//shoot the arrow
                 CurrentArrow = Instantiate(Arrow, ShootFrom.position,CameraRef.rotation);
                 CurrentArrow.GetComponent<Rigidbody>().velocity = CameraRef.forward  * (currentArrowForce * maxArrowForce);
@@ -402,9 +406,9 @@ public class PlayerController : MonoBehaviour
             if(currentArrowForce < 1f)//ceiling
             {
                 currentArrowForce += Time.deltaTime;
+                updateCharge(currentArrowForce);
             }
             yield return new WaitForSeconds(.01f);
-
         }
     }
     #endregion
