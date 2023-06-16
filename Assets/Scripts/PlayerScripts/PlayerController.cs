@@ -11,7 +11,10 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+//Ensures required components are included in parent game object
 [RequireComponent(typeof(Health))]
+[RequireComponent(typeof(AmmoInventory))]
+
 public class PlayerController : MonoBehaviour
 {
 
@@ -62,14 +65,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("The radius the ground will check out. best practice is to keep it at most the radius of the character controller")]
     [SerializeField] private float GroundedRadius;
     #endregion
-
-    #region Serialized Arrow Variables
-    [Header("Arrow stats")]
-    [Tooltip("How many arrows the player currently has")]
-    [SerializeField] private int ammo;
-
-    [Tooltip("How many arrows can the palyer hold at one time")]
-    [SerializeField] private int ammoMax;
 
     [Tooltip("How strong your arrow can be shot")]
     [SerializeField] private float maxArrowForce;
@@ -134,6 +129,8 @@ public class PlayerController : MonoBehaviour
     //
     private Health healthSystem;
     //
+    private AmmoInventory ammoSystem;
+    //
     private bool isGrappled;
     //
     private Vector3 BoostVector;
@@ -145,6 +142,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         healthSystem = GetComponent<Health>(); //Needs to link immediately to not break HUD -BMH
+        ammoSystem = GetComponent<AmmoInventory>(); //Needs to link immediately to not break HUD - BMH
     }
 
     // Start is called before the first frame update
@@ -372,7 +370,7 @@ public class PlayerController : MonoBehaviour
     {
         if (value.isPressed)// if the arrow is  pressed and has ammo left
         {
-            if(ammo > 0)
+            if(!ammoSystem.QuiverIsEmpty())
             {
                 shotPressed = true;
                 StartCoroutine(chargeShot()); //start charging the arrow
@@ -381,7 +379,7 @@ public class PlayerController : MonoBehaviour
         else//if the arrow is pressed and has ammo elft
         {                
             updateCharge(0);
-            if(ammo > 0)
+            if(!ammoSystem.QuiverIsEmpty())
             {
                 shotPressed = false;
                 isGrappled = false;//shoot the arrow
@@ -389,8 +387,8 @@ public class PlayerController : MonoBehaviour
                 CurrentArrow.GetComponent<Rigidbody>().velocity = CameraRef.forward  * (currentArrowForce * maxArrowForce);
                 CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(arrowNum);
                 currentArrowForce = 0f;
-                ammo--;
-                updateAmmo(ammo);
+                ammoSystem.PullFromQuiver();
+                updateAmmo(ammoSystem.GetArrowCount());
             }
         }
     }
@@ -439,7 +437,12 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     public bool AddAmmo(int ammoAdd)
     {
-        if (ammo == ammoMax)
+        bool addArrowStatus = ammoSystem.AddToQuiver(ammoAdd);
+        updateAmmo(ammoSystem.GetArrowCount());
+        return addArrowStatus;
+
+
+        /*if (ammo == ammoMax)
         {
             //Debug.Log("AddAmmo called - ammo already full");
             updateAmmo(ammoMax);
@@ -459,7 +462,7 @@ public class PlayerController : MonoBehaviour
             //
             //+Debug.Log("AddAmmo called - ammo now " + ammo);
             return true;
-        }
+        }*/
     }
 
     #endregion
@@ -486,7 +489,7 @@ public class PlayerController : MonoBehaviour
     #region Getters
     public int getMaxHealth() { return this.healthSystem.getMaximumHealth(); }
     public int getCurrHealth() { return this.healthSystem.getCurrentHealth(); }
-    public int getCurrAmmo() { return ammo; }
-    public int getMaxAmmo() { return ammoMax; }
+    public int getCurrAmmo() { return this.ammoSystem.GetArrowCount(); }
+    public int getMaxAmmo() { return this.ammoSystem.GetQuiverSize(); }
     #endregion
 }
