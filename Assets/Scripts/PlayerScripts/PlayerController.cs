@@ -137,8 +137,6 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #endregion
-
     private void Awake()
     {
         healthSystem = GetComponent<Health>(); //Needs to link immediately to not break HUD -BMH
