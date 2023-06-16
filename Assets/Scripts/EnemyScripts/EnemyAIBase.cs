@@ -48,12 +48,16 @@ public class EnemyAIBase : MonoBehaviour
     [SerializeField] private float GeneralPerceptionRadius;
 
     [Tooltip("The distance the enemy should stop at before reaching the player. This should change based on the enemy type.")]
-    [SerializeField] private int AttackDistance;
+    [SerializeField] private int AttackDistance = 3;
+
+    [Tooltip("How long should the enemy pursue when the player escapes?")]
+    [SerializeField] private float ChaseTime = 0;
 
     private NavMeshAgent NavAgent;
     private int PatrolIndex = 0;
 
     private float PatrolTimer;
+    private Timer ChaseTimer;
 
     private bool bShouldPatrol;
     private bool bShouldAttack;
@@ -97,8 +101,15 @@ public class EnemyAIBase : MonoBehaviour
 
         DecideState(CurrentState);
 
+        ChaseTimer = gameObject.AddComponent<Timer>();
 
+       
+    }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(EnemyPosition, GeneralPerceptionRadius);
     }
 
 
@@ -109,41 +120,49 @@ public class EnemyAIBase : MonoBehaviour
 
         //Enemy AI State Machine
         DecideState(CurrentState);
+        if(ChaseTimer.bHasTimerStarted())
+        {
 
+            Debug.Log("Time Left: " + ChaseTimer.GetTimeLeft());
 
+        }
 
+        if (ChaseTimer.bHasTimerCompleted())
+        {
+            Debug.Log("Timer has ended");
+        }
 
     }
     private void DecideState(EnemyStates CState)
     {
-        //expression simplification bools
-        bShouldPatrol = Patrol || PatrolPoints != null && CurrentState == EnemyStates.Idle;
-        bShouldAttack = CurrentState == EnemyStates.Chasing && NavAgent.remainingDistance < .5;
-        bPlayerVisible = IsPlayerVisible(GeneralPerceptionRadius);
-
-
-        if (bShouldPatrol)
-        {
-            
-            CurrentState = EnemyStates.Patrolling;
-        }
-        if (bPlayerVisible)
-        {
-
-            Patrol = false;
-            CurrentState = EnemyStates.Chasing;
-        }
+        
+        
        
-        if (bShouldAttack)
-        {
-            CurrentState = EnemyStates.Attacking;
-        }
 
         //return to patrol or idle if player is lost
-        if(!bPlayerVisible)
+        if(CurrentState == EnemyStates.Chasing)
         {
+            //&& (CurrentState == EnemyStates.Chasing)
+            if (!bPlayerVisible)
+            {
+                
+
+
+            }
+            if (ChaseTimer.bHasTimerCompleted())
+            {
+                Debug.Log("Timer has ended successfully!");
+                CurrentState = EnemyStates.Idle;
+            }
+
+            if (!ChaseTimer.bHasTimerStarted())
+            {
+                ChaseTimer.NewTimer(ChaseTime);
+
+            }
 
         }
+      
 
 
         switch (CState)
@@ -184,6 +203,29 @@ public class EnemyAIBase : MonoBehaviour
 
         }
     }
+
+    private IEnumerator Idle()
+    {
+        //expression simplification bools
+        bShouldPatrol = Patrol || PatrolPoints != null && CurrentState == EnemyStates.Idle;
+        bPlayerVisible = IsPlayerVisible(GeneralPerceptionRadius);
+        PlayerPosition = Player.gameObject.transform.position;
+
+        if (bPlayerVisible)
+        {
+
+            //Patrol = false;
+            CurrentState = EnemyStates.Chasing;
+        }
+        
+       else if (bShouldPatrol)
+        {
+
+            CurrentState = EnemyStates.Patrolling;
+        }
+        yield break;
+    }
+
     private bool IsPlayerVisible(float Radius)
     {
         if (Player == null)
@@ -199,13 +241,13 @@ public class EnemyAIBase : MonoBehaviour
         }
         return false;
     }
-    private void NextPatrolPoint() 
+    private IEnumerator NextPatrolPoint() 
     {   
         if(PatrolPoints == null)
         {
-            return;
+            yield break;
         }
-       Debug.Log("Patrolling");
+     //  Debug.Log("Patrolling");
 
         if ( (PatrolIndex >  (PatrolPoints.Length - 1) )|| (PatrolIndex < 0) )
         {
@@ -230,13 +272,21 @@ public class EnemyAIBase : MonoBehaviour
         PatrolIndex++;
 
         PatrolTimer = Duration;
+
+        yield return new WaitForSeconds(Time.deltaTime);
+
     }
 
     private void ChasePlayer(int BufferDistance)
     {
-        
 
-        Debug.Log("Chasing");
+        bShouldAttack = CurrentState == EnemyStates.Chasing && NavAgent.remainingDistance < .5;
+        if (bShouldAttack)
+        {
+            //CurrentState = EnemyStates.Attacking;
+        }
+
+        // Debug.Log("Chasing");
         NavAgent.stoppingDistance = BufferDistance;
         NavAgent.SetDestination(PlayerPosition);
     }

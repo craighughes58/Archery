@@ -20,13 +20,7 @@ public  class EnemyController : MonoBehaviour
 
     #region Public variables
     //public variables begin
-    [Header("Health")]
-
-    [Tooltip("The current health of an enemy.")]
-    public int Health;
-
-    [Tooltip("The amount of damage that can be taken before destruction.")]
-    public int MaxHealth = 10;
+   
 
     //end public variables
     #endregion
@@ -73,7 +67,7 @@ public  class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Health = MaxHealth;
+        
 
         
     }
