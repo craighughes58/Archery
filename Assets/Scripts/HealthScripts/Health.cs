@@ -43,6 +43,7 @@ public class Health : MonoBehaviour
     /// function to process a damage request
     /// </summary>
     /// <param name="damageAmount"></param>
+    /// I would rename this to TakeDamage, it's a lil ambiguous -MKE
     public void damage(int damageAmount) //might overload later to add "damage types"
     {
         int effectiveDamage = damageAmount;
@@ -54,7 +55,9 @@ public class Health : MonoBehaviour
         }
 
         this.currentHealth = Mathf.Max(0, this.currentHealth - effectiveDamage); //updates health, bounded to zero
-        onHealthChange(currentHealth); //notify relevant parties health has changed 
+        //when uncommented, throws a null reference exception for not being an instance. Do you need to create a Start()
+        //and set this? -MKE
+       // onHealthChange(currentHealth); //notify relevant parties health has changed 
     }
 
     /// <summary>

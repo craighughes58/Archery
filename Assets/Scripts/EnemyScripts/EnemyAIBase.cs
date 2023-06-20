@@ -22,6 +22,13 @@ public class EnemyAIBase : MonoBehaviour
 {
 
     #region Private Variables
+    [Header("Attack Settings")]
+
+    [Tooltip("What kind of damage should the enemy inflict?")]
+    [SerializeField] private AttackCategories AttackType;
+
+    [Tooltip("This enemy's base damage to apply.")]
+    [SerializeField] private int BaseDamage = 5;
 
     [Header("Patrol Settings")]
 
@@ -80,10 +87,20 @@ public class EnemyAIBase : MonoBehaviour
             Chasing,
             Attacking
         }
+    
+    private enum AttackCategories
+    {
+        Melee,
+        Ranged,
+        SelfDestruct
+    }
 
     #endregion
 
-    
+    EnemyAIBase(AttackCategories AttackType)
+    {
+        this.AttackType = AttackType;
+    }
    
 
     // Start is called before the first frame update
@@ -128,10 +145,14 @@ public class EnemyAIBase : MonoBehaviour
    
 
     }
+    /// <summary>
+    /// function to handle what action an enemy should take next
+    /// </summary>
+    /// <param name="CState"></param>
     private void DecideState(EnemyStates CState)
     {
         //the logic of switching to a new state itself (ex. CState = EnemyStates.Patrolling)
-        //occurs within each method associated with the case
+        //occurs within other state functions as logic it becomes necessary.
         switch (CState)
         {
             case EnemyStates.Idle:
@@ -153,6 +174,8 @@ public class EnemyAIBase : MonoBehaviour
                 }
             case EnemyStates.Attacking:
                 {
+                    Debug.Log("attacking");
+                    AttackPlayer(AttackType);
                     break;
                 }
             default:
@@ -335,20 +358,63 @@ public class EnemyAIBase : MonoBehaviour
         }
         #endregion
 
-        bShouldAttack = CurrentState == EnemyStates.Chasing && NavAgent.remainingDistance < .5;
+        bShouldAttack = (CurrentState == EnemyStates.Chasing) && NavAgent.remainingDistance <= BufferDistance;
         if (bShouldAttack)
         {
-            //CurrentState = EnemyStates.Attacking;
+            CurrentState = EnemyStates.Attacking;
         }
 
         NavAgent.stoppingDistance = BufferDistance;
         NavAgent.SetDestination(PlayerPosition);
     }
    
-    private void AttackPlayer()
+    private void AttackPlayer(AttackCategories CurrentAttackType)
     {
+       bool bShouldChase = (CurrentState == EnemyStates.Attacking) && Vector3.Distance(EnemyPosition, PlayerPosition) > AttackDistance;
+        if (bShouldChase)
+        {
+            CurrentState = EnemyStates.Chasing;
+        }
 
+        switch (CurrentAttackType)
+        {
+            case AttackCategories.Melee:
+                {
+
+                    //Melee method to be added later
+                    break;
+                }
+
+            case AttackCategories.Ranged:
+                {
+                    //Ranged method to be added later
+                    break;
+                }
+            case AttackCategories.SelfDestruct:
+                {
+                    NavAgent.stoppingDistance = 0;
+                    //OnCollisionEnter will handle the rest of inflicting damage in this case
+                    break;
+                }
+        }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        #region Safety Catch If No Collider
+        if (collision.collider == null) return;
+        #endregion
 
+        if (collision.collider == Player.GetComponent<Collider>())
+        {
+            if (AttackType == AttackCategories.SelfDestruct)
+            {
+                Player.GetComponent<Health>().damage(BaseDamage);
+                Destroy(gameObject);
+            }
+        }
+        
+        
+      
+    }
 }
