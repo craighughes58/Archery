@@ -9,7 +9,7 @@ public abstract class SpawnerBehaviour : MonoBehaviour
         GameController.Instance.AddSpawner(GetComponent<SpawnerBehaviour>());
     }
     [Tooltip("The basic enemy that this prefab spawns")]
-    [SerializeField] private GameObject Enemy;
+    [SerializeField] public GameObject Enemy;
     
     /// <summary>
     /// 
