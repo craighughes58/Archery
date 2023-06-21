@@ -65,6 +65,22 @@ public class Health : MonoBehaviour
     {
         return ((currentHealth >= maximumHealth) ? true : false);
     }
+
+    /// <summary>
+    /// Returns true if health is above 0; otherwise false.
+    /// </summary>
+    /// <returns></returns>
+    public bool isAlive()
+    {
+        if (this.currentHealth > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     #endregion
 
     #region Getters & Setters
