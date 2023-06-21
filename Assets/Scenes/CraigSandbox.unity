@@ -128,6 +128,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2684312175388576324, guid: d4958227484245e4592c41ab2c02ad22, type: 3}
   m_PrefabInstance: {fileID: 1187026929}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &217845142
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 217845144}
+  - component: {fileID: 217845143}
+  m_Layer: 0
+  m_Name: ZoneSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &217845143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 217845142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627106d331a2ab04eab7c8039a826a6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Enemy: {fileID: 8757429958323262131, guid: c44b5e2a57cb08944aa3a63308ae5b2a, type: 3}
+  spawnRadius: 5
+  enemyMax: 3
+  timer: 5
+  canRespawn: 1
+--- !u!4 &217845144
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 217845142}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.174, y: 3, z: -0.619}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &461174482
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,6 +415,8 @@ GameObject:
   - component: {fileID: 760968203}
   - component: {fileID: 760968205}
   - component: {fileID: 760968206}
+  - component: {fileID: 760968208}
+  - component: {fileID: 760968207}
   m_Layer: 1
   m_Name: Player
   m_TagString: Player
@@ -481,10 +532,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   GroundedRadius: 0.3
-  health: 5
-  healthMax: 0
-  ammo: 15
-  ammoMax: 0
   maxArrowForce: 20
   Arrow: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
   ShootFrom: {fileID: 711009615}
@@ -620,6 +667,36 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &760968207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760968198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5056943a43498a14088ca16770e7b764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasInfininiteAmmo: 0
+  quiverSize: 10
+  quiverArrowCount: 10
+--- !u!114 &760968208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760968198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f6f1010da01bde4087ccba0ede68d1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maximumHealth: 10
+  currentHealth: 10
+  damageReduction: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
