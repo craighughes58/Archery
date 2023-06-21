@@ -52,8 +52,6 @@ public class TurretBehaviour : MonoBehaviour
     //reference to the rigidbody
     private Rigidbody rb;
     //
-    private Rigidbody SkullRb;
-    //
     private Quaternion StartRotation;
     //
     private Vector3 startPosition;
@@ -67,7 +65,6 @@ public class TurretBehaviour : MonoBehaviour
         StartRotation = SkullTransform.localRotation;
         startPosition = SkullTransform.localPosition;
         rb = GetComponent<Rigidbody>();
-        SkullRb = SkullTransform.gameObject.GetComponent<Rigidbody>();
         Player = null;
     }
 
