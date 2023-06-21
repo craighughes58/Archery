@@ -84,7 +84,6 @@ public class ZoneSpawnerBehaviour : SpawnerBehaviour
 
     private void OnDrawGizmos()
     {
-        print(123123);
         Gizmos.color = Color.green;
         Gizmos.DrawSphere(transform.position, spawnRadius);
     }
