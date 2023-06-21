@@ -40,6 +40,9 @@ public class TurretBehaviour : MonoBehaviour
     [Tooltip("The time in between firing and reloading")]
     [SerializeField] private float stallTime;
 
+    [Tooltip("The turret looks very low to the ground so this can make it look up higher")]
+    [SerializeField] private float yOffset;
+
 
     #endregion
 
@@ -68,20 +71,19 @@ public class TurretBehaviour : MonoBehaviour
         Player = null;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     #region Movement
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator FacePlayer()
     {
         RaycastHit Hit;
         while(Player != null)
         {
-            Quaternion TargetRotation = Quaternion.LookRotation(Player.position - transform.position);//create new rotate closer to the player
+            Quaternion TargetRotation = Quaternion.LookRotation(Player.position + new Vector3(0,yOffset,0) - transform.position);//create new rotate closer to the player
             rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, TargetRotation, rotationSpeed));//set current rotation to new rotation
             if (Physics.Raycast(transform.position, transform.forward, out Hit))//this section checks if the raycast hits a collider and if the collider is the player
             {
@@ -99,10 +101,22 @@ public class TurretBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator ReturnToStationary()
+    {
+        yield return null;
+    }
     #endregion
 
     #region Attacking 
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator Fire()
     {
         FakeFireball.gameObject.SetActive(true);
@@ -115,14 +129,12 @@ public class TurretBehaviour : MonoBehaviour
                     amount += firingSpeed * Time.deltaTime;
                     yield return new WaitForSeconds(Time.deltaTime);
                 }
-       // StartCoroutine(ChangeMouthPos(SkullUpPosition.rotation, SkullUpPosition.position)); doesn't work it gets out of sync
-        //fire
+       //StartCoroutine(ChangeMouthPos(SkullUpPosition.rotation, SkullUpPosition.position)); doesn't work it gets out of sync
         yield return new WaitForSeconds(1f);
         FakeFireball.gameObject.SetActive(false);
         Instantiate(Projectile, FakeFireball.transform.position, transform.rotation);//fire the bullet
         yield return new WaitForSeconds(1f);
         //StartCoroutine(ChangeMouthPos(StartRotation * transform.rotation, startPosition + transform.position));
-        //close the jaw
                 while (SkullTransform.rotation != StartRotation * transform.rotation)//close the jaw
                 {
                     SkullTransform.position = Vector3.MoveTowards(SkullTransform.position, startPosition + transform.position , firingSpeed * Time.deltaTime);
@@ -160,16 +172,10 @@ public class TurretBehaviour : MonoBehaviour
         if (other.gameObject.tag.Equals("Player"))
         {
             Player = null;
+            StartCoroutine(ReturnToStationary());
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    private bool confirmPlayer()
-    {
-        return true;
-    }
+
     #endregion
 }

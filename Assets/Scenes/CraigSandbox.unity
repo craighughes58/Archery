@@ -538,6 +538,7 @@ MonoBehaviour:
   firingSpeed: 3
   SkullUpPosition: {fileID: 1144283751}
   stallTime: 2
+  yOffset: 0.75
 --- !u!135 &733430083
 SphereCollider:
   m_ObjectHideFlags: 0
