@@ -54,7 +54,7 @@ public class Health : MonoBehaviour
         }
 
         this.currentHealth = Mathf.Max(0, this.currentHealth - effectiveDamage); //updates health, bounded to zero
-        onHealthChange(currentHealth); //notify relevant parties health has changed 
+        this.onHealthChange?.Invoke(currentHealth); //notify relevant parties health has changed 
     }
 
     /// <summary>
@@ -64,6 +64,22 @@ public class Health : MonoBehaviour
     public bool isFull()
     {
         return ((currentHealth >= maximumHealth) ? true : false);
+    }
+
+    /// <summary>
+    /// Returns true if health is above 0; otherwise false.
+    /// </summary>
+    /// <returns></returns>
+    public bool isAlive()
+    {
+        if (this.currentHealth > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     #endregion
 
