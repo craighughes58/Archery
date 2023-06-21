@@ -54,7 +54,7 @@ public class Health : MonoBehaviour
         }
 
         this.currentHealth = Mathf.Max(0, this.currentHealth - effectiveDamage); //updates health, bounded to zero
-        onHealthChange(currentHealth); //notify relevant parties health has changed 
+        this.onHealthChange?.Invoke(currentHealth); //notify relevant parties health has changed 
     }
 
     /// <summary>
