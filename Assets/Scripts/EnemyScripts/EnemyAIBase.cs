@@ -18,10 +18,14 @@ using UnityEngine.AI;
 using UnityEngine.Assertions;
 using UnityEngine.InputSystem.HID;
 
+
 public class EnemyAIBase : MonoBehaviour
 {
 
     #region Private Variables
+
+    #region Serialized Fields
+    #region Attack Settings
     [Header("Attack Settings")]
 
     [Tooltip("What kind of damage should the enemy inflict?")]
@@ -30,10 +34,15 @@ public class EnemyAIBase : MonoBehaviour
     [Tooltip("This enemy's base damage to apply.")]
     [SerializeField] private int BaseDamage = 5;
 
+    [Tooltip("The distance the enemy should stop at before reaching the player. This should change based on the enemy type.")]
+    [SerializeField] private int AttackDistance = 3;
+    #endregion
+
+    #region Patrol Settings
     [Header("Patrol Settings")]
 
-    [Tooltip("Should this enemy be assigned a patrol?")]
-    [SerializeField] private bool ShouldPatrol;
+    [Tooltip("Set the patrol behavior type for this enemy")]
+    [SerializeField] private PatrolCategories PatrolType;
 
     [Tooltip("By default, the patrol will be begin at the first index and loop through each point in the array.")]
     [SerializeField]private Transform[] PatrolPoints;
@@ -41,45 +50,54 @@ public class EnemyAIBase : MonoBehaviour
     [Tooltip("Time in seconds until next movement.")]
     [SerializeField]private float PatrolDelay = 3;
 
-    [Tooltip("Randomize patrol order?")]
-    [SerializeField] private bool RandomPointOrder;
+    //[Tooltip("Randomize delay time?")]
+    [SerializeField] 
+    private bool RandomDelayTime;
+    // [Tooltip("Check that Randomize Delay Time is set to true. Maximum idle time between patrol points.")]
+    [SerializeField]
+    private float RandomDelayMaxTime;
 
-    [Tooltip("Randomize delay time?")]
-    [SerializeField] private bool RandomDelayTime;
+    #endregion
 
-    [Tooltip("Check that Randomize Delay Time is set to true. Maximum idle time between patrol points.")]
-    [SerializeField] private float RandomDelayMaxTime;
-
+    #region Perception Settings
     [Header("Perception Settings")]
+
+    [Tooltip("The forward distance the enemy can see to.")]
+    [SerializeField] private float RangedPerceptionDistance;
 
     [Tooltip("The radial distance the enemy can see to.")]
     [SerializeField] private float GeneralPerceptionRadius;
 
-    [Tooltip("The distance the enemy should stop at before reaching the player. This should change based on the enemy type.")]
-    [SerializeField] private int AttackDistance = 3;
-
     [Tooltip("How long should the enemy pursue when the player escapes?")]
     [SerializeField] private float ChaseTime = 0;
+    #endregion
+    #endregion
 
+    #region Non-Serialized Fields
+
+    #region Objects & Custom Classes
     private NavMeshAgent NavAgent;
+    private GameObject Player;
+    private Timer Timer;
+    #endregion
+
     private int PatrolIndex = 0;
 
-    private Timer Timer;
-
+    #region Booleans
     private bool bShouldPatrol;
     private bool bShouldAttack;
     private bool bPlayerVisible;
-   
+    #endregion
 
-    private EnemyController EnemyController;
-
-    private GameObject Player;
+    #region Vectors
     private Vector3 PlayerPosition;
-
     private Vector3 EnemyPosition;
     private Vector3 StartPosition;
+    #endregion
 
     private EnemyStates CurrentState;
+
+    #region Enums
     private enum EnemyStates
         {
             Idle,
@@ -95,58 +113,61 @@ public class EnemyAIBase : MonoBehaviour
         SelfDestruct
     }
 
+    private enum PatrolCategories
+    {
+        None,
+        Patrol,
+        Roam
+    }
     #endregion
 
-    EnemyAIBase(AttackCategories AttackType)
-    {
-        this.AttackType = AttackType;
-    }
-   
+    #endregion
+
+    #endregion
 
     // Start is called before the first frame update
     void Start()
     {
-
-        EnemyController = GetComponent<EnemyController>();
-
+        //initial setup for our movement component
         NavAgent = GetComponent<NavMeshAgent>();
         NavAgent.autoBraking = false;
-        NavAgent.speed = EnemyController.speed;
+        NavAgent.speed = GetComponent<EnemyController>().speed;
 
+        //grab the player
         Player = GameObject.FindGameObjectWithTag("Player");
         PlayerPosition = Player.transform.position;
 
+        //record initial values to compare
         EnemyPosition = this.gameObject.transform.position;
         StartPosition = this.gameObject.transform.position;
 
+        //default state set
         CurrentState = EnemyStates.Idle;
 
+        //REQUIRED for patrol and chase behaviors
         Timer = gameObject.AddComponent<Timer>();
-       
-       
     }
 
-    /*private void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawSphere(EnemyPosition, GeneralPerceptionRadius);
-    }*/
+       
+        Gizmos.DrawRay(EnemyPosition, this.transform.forward * RangedPerceptionDistance);
+    }
 
 
     // Update is called once per frame
     void Update()
     {
-        EnemyPosition = this.transform.position;
-        PlayerPosition = Player.transform.position;
-        bPlayerVisible = IsPlayerVisible();
+        //Makes sure our data is accurate for later checks
+        UpdateVariables();
 
         //Enemy AI State Machine
         DecideState(CurrentState);
-   
-
+  
     }
     /// <summary>
-    /// function to handle what action an enemy should take next
+    /// A switch machine bringing us to the correct behavior based on the state information.
     /// </summary>
     /// <param name="CState"></param>
     private void DecideState(EnemyStates CState)
@@ -163,7 +184,7 @@ public class EnemyAIBase : MonoBehaviour
                 }
             case EnemyStates.Patrolling:
                 {
-                    //all timer logic and switching out of this case exists therein
+                    //all timer logic to perform the patrol and switching out of this case exists therein
                     Patrolling();
                     break;
                 }
@@ -174,7 +195,6 @@ public class EnemyAIBase : MonoBehaviour
                 }
             case EnemyStates.Attacking:
                 {
-                    Debug.Log("attacking");
                     AttackPlayer(AttackType);
                     break;
                 }
@@ -182,16 +202,18 @@ public class EnemyAIBase : MonoBehaviour
                 {
                     break;
                 }
-
-
         }
     }
 
+    /// <summary>
+    /// Handles initial state changes when enemy become idle.
+    /// Changes pending to reflect roaming system
+    /// </summary>
     private void Idle()
     {
         #region Determine our factors
         //expression simplification bools
-        bShouldPatrol = ShouldPatrol && PatrolPoints != null && CurrentState == EnemyStates.Idle;
+        bShouldPatrol = (PatrolType == PatrolCategories.Patrol) || (PatrolType == PatrolCategories.Roam) && PatrolPoints != null && CurrentState == EnemyStates.Idle;
         #endregion
 
         #region Set a state (Chase, Patrol, or continue Idling)
@@ -207,6 +229,12 @@ public class EnemyAIBase : MonoBehaviour
         #endregion
 
     }
+
+    /// <summary>
+    /// Checks if the player is visible within long or close range.
+    /// Long range detection TBD.
+    /// </summary>
+    /// <returns></returns>
     private bool IsPlayerVisible()
     {
         #region Check Player Exists
@@ -219,10 +247,8 @@ public class EnemyAIBase : MonoBehaviour
 
         #region Perform Raycast
         RaycastHit Hit;
-
-        Vector3 Direction = PlayerPosition - EnemyPosition;
-
-        Physics.Raycast(this.transform.position, Direction, out Hit, GeneralPerceptionRadius);
+        Vector3 Direction = (PlayerPosition - EnemyPosition).normalized;
+        Physics.Raycast(this.transform.position, Direction, out Hit, RangedPerceptionDistance);
         #endregion
 
         #region Return if no hit
@@ -232,27 +258,67 @@ public class EnemyAIBase : MonoBehaviour
         }
         #endregion
 
-        #region Return true if hit is player
+        #region Process hit on player
         if ( 
             (Hit.collider == Player.GetComponent<Collider>())
 
             && (Hit.collider != this.gameObject.GetComponent<Collider>())
 
-            && (Hit.distance <= GeneralPerceptionRadius)
+            && (Hit.distance <= RangedPerceptionDistance)
 
             )
         {
-            return true;
+            //we want the cross product because we can use other information in this vector to affect our rotation later on
+            Vector3 CrossProduct = Vector3.Cross(EnemyPosition.normalized, PlayerPosition.normalized);
+
+            #region Rotational Checks (Currently COMMENTED and UNUSED)
+            //future rotational checks if desired
+            //in this case a negative Y indicates an object to the right of the requesting object
+            /* if (CrossProduct.y > 0.2)
+             {
+                 Debug.Log("Player is to the left of the enemy!");
+             }
+             else if (CrossProduct.y < -0.2)
+             {
+                 Debug.Log("Player is to the right of the enemy!");
+
+             }
+             else
+             {
+                 Debug.Log("Player is in line with the enemy!");
+
+             }*/
+            #endregion
+
+            #region Visibility Range Check
+            //if the x vector is positive, we are in front of the enemy
+            if (CrossProduct.x > 0)
+            {
+                return true;
+            }
+            //if we are behind the enemy, we should still be able to detect the player if close enough
+            else if (Hit.distance <= GeneralPerceptionRadius)
+            {
+                return true;
+            }
+            else { return false; }
+
+            #endregion
+
         }
         #endregion
 
-        #region Return false if not the player
+        #region Return false if not in range
         else
         {
             return false;
         }
         #endregion
     }
+
+    /// <summary>
+    /// Handles patrol behavior for the enemy.
+    /// </summary>
     private void Patrolling() 
     {
         #region Safety catch for no Patrol Points set
@@ -278,7 +344,7 @@ public class EnemyAIBase : MonoBehaviour
             PatrolIndex = 0; 
         }
 
-        if(RandomPointOrder == true)
+        if(PatrolType == PatrolCategories.Roam)
         {
             PatrolIndex = Random.Range(0, PatrolPoints.Length - 1);
         }
@@ -308,6 +374,7 @@ public class EnemyAIBase : MonoBehaviour
                 NavAgent.stoppingDistance = 0;
                 PatrolIndex++;
             }
+            //get a timer going when needed
             else if (!Timer.bHasTimerStarted())
             {
                 //initial kick-off w/out a delay since default NavAgent destination is itself
@@ -325,9 +392,14 @@ public class EnemyAIBase : MonoBehaviour
         }
         #endregion
     }
+
+    /// <summary>
+    /// Handles chase behavior for the enemy.
+    /// </summary>
+    /// <param name="BufferDistance"></param>
     private void ChasePlayer(int BufferDistance)
     {
-        #region Chase Timer
+        #region Chase Timer & visibility check
         //stop the countdown if player returns to view
         if (bPlayerVisible)
         {
@@ -358,29 +430,40 @@ public class EnemyAIBase : MonoBehaviour
         }
         #endregion
 
+        #region Check if we are in range to be Attacking
         bShouldAttack = (CurrentState == EnemyStates.Chasing) && NavAgent.remainingDistance <= BufferDistance;
         if (bShouldAttack)
         {
             CurrentState = EnemyStates.Attacking;
         }
+        #endregion
 
+        #region CHASE that player!
         NavAgent.stoppingDistance = BufferDistance;
         NavAgent.SetDestination(PlayerPosition);
+        #endregion
     }
-   
+
+    /// <summary>
+    /// Handles attack behavior for the enemy.
+    /// </summary>
+    /// <param name="CurrentAttackType"></param>
     private void AttackPlayer(AttackCategories CurrentAttackType)
     {
-       bool bShouldChase = (CurrentState == EnemyStates.Attacking) && Vector3.Distance(EnemyPosition, PlayerPosition) > AttackDistance;
+        #region Check Player Can Be Attacked
+        bool bShouldChase = (CurrentState == EnemyStates.Attacking) && Vector3.Distance(EnemyPosition, PlayerPosition) > AttackDistance;
         if (bShouldChase)
         {
+            //let the chasing state revert us to idle if the player is lost
             CurrentState = EnemyStates.Chasing;
         }
+        #endregion
 
+        #region Process the Enemy's Attack Type
         switch (CurrentAttackType)
         {
             case AttackCategories.Melee:
                 {
-
                     //Melee method to be added later
                     break;
                 }
@@ -397,14 +480,20 @@ public class EnemyAIBase : MonoBehaviour
                     break;
                 }
         }
+        #endregion
     }
 
+    /// <summary>
+    /// Handles the collision processing for the Enemy. Handles final Self-Destruct processes.
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter(Collision collision)
     {
         #region Safety Catch If No Collider
         if (collision.collider == null) return;
         #endregion
 
+        #region Self Destruct Processing
         if (collision.collider == Player.GetComponent<Collider>())
         {
             if (AttackType == AttackCategories.SelfDestruct)
@@ -413,8 +502,44 @@ public class EnemyAIBase : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        
-        
-      
+        #endregion
     }
+
+    /// <summary>
+    /// Place any class scope variables w/ their checks here for per frame updating.
+    /// </summary>
+    private void UpdateVariables()
+    {
+        EnemyPosition = this.transform.position;
+        PlayerPosition = Player.transform.position;
+        bPlayerVisible = IsPlayerVisible();
+    }
+
+    //this is WIP. Idea is to make random max delay time float field only available if random delay time bool has been set to true
+    //
+    #region CustomEditor
+#if UNITY_EDITOR
+    [CustomEditor(typeof(EnemyAIBase))]
+    [CanEditMultipleObjects]
+    public class EnemyAIBaseEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            EnemyAIBase enemyAIBase = (EnemyAIBase)target;
+
+            if (enemyAIBase.RandomDelayTime)
+            {
+               // EditorGUILayout.FloatField("Maximum random delay time", enemyAIBase.RandomDelayMaxTime);
+            }
+
+            /*using (new EditorGUI.DisabledScope(enemyAIBase.RandomDelayTime == false))
+            {
+                enemyAIBase.RandomDelayMaxTime = EditorGUILayout.FloatField("Maximum random delay time", enemyAIBase.RandomDelayMaxTime);
+            }*/
+        }
+    }
+#endif
+    #endregion
 }
