@@ -2,17 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurretBehaviour : MonoBehaviour
+public class TurretBehaviour : EnemyAIBase
 {
 
     #region Serialized Variables
 
-    [Header("Zone of Perception:")]
+    /*[Header("Zone of Perception:")]
     [Tooltip("The zone where the player is seen by the enemy")]
     [SerializeField] private SphereCollider SphereCol;
 
     [Tooltip("The radius of the sphere collider")]
-    [SerializeField] private float perceptionRadius;
+    [SerializeField] private float perceptionRadius;*/
 
     [Header("Object References:")]
     [Tooltip("The reference to the transform of the top piece of the turret")]
@@ -48,7 +48,8 @@ public class TurretBehaviour : MonoBehaviour
 
     #region Private variables
     //active reference to the player
-    private Transform Player;
+   // private Transform Player;
+
     //reference to the rigidbody
     private Rigidbody rb;
     //
@@ -59,15 +60,31 @@ public class TurretBehaviour : MonoBehaviour
     private bool lockedOn;
     #endregion
     // Start is called before the first frame update
-    void Start()
+    internal override void Start()
     {
-        SphereCol.radius = perceptionRadius;
+        base.Start();
+
+       // SphereCol.radius = perceptionRadius;
         StartRotation = SkullTransform.localRotation;
         startPosition = SkullTransform.localPosition;
         rb = GetComponent<Rigidbody>();
-        Player = null;
+       // Player = null;
     }
 
+    internal override void Update()
+    {
+        base.Update();
+    }
+    internal override void Idle()
+    {
+//        StartCoroutine(ReturnToStationary());
+        base.Idle();
+    }
+    internal override void Ranged()
+    {
+        base.Ranged();
+        FacePlayer();
+    }
 
     #region Movement
 
@@ -75,27 +92,20 @@ public class TurretBehaviour : MonoBehaviour
     /// 
     /// </summary>
     /// <returns></returns>
-    public IEnumerator FacePlayer()
+    public void FacePlayer()
     {
-        RaycastHit Hit;
-        while(Player != null)
-        {
-            Quaternion TargetRotation = Quaternion.LookRotation(Player.position + new Vector3(0,yOffset,0) - transform.position);//create new rotate closer to the player
-            rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, TargetRotation, rotationSpeed));//set current rotation to new rotation
-            if (Physics.Raycast(transform.position, transform.forward, out Hit))//this section checks if the raycast hits a collider and if the collider is the player
-            {
-                if (Hit.collider)//hit a collider
-                {
-                    if (Hit.collider.tag.Equals("Player") && !lockedOn)//collider is player
+            //create new rotate closer to the player
+            Quaternion TargetRotation = Quaternion.LookRotation(PlayerPosition + new Vector3(0,yOffset,0) - transform.position);
+            //set current rotation to new rotation
+            rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, TargetRotation, rotationSpeed));
+            //lock us on!  
+                    if (!lockedOn)
                     {
                         lockedOn = true;
-                        StartCoroutine(Fire());//shoot the player
+                    //shoot the player
+                     StartCoroutine(Fire());
                     }
 
-                }
-            }
-            yield return new WaitForSeconds(Time.deltaTime);
-        }
     }
 
     /// <summary>
@@ -151,7 +161,7 @@ public class TurretBehaviour : MonoBehaviour
     /// 
     /// </summary>
     /// <param name="other"></param>
-    private void OnTriggerEnter(Collider other)
+   /* private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.tag.Equals("Player"))
         {
@@ -159,19 +169,19 @@ public class TurretBehaviour : MonoBehaviour
             StartCoroutine(FacePlayer());
             
         }
-    }
+    }*/
     /// <summary>
     /// 
     /// </summary>
     /// <param name="other"></param>
-    private void OnTriggerExit(Collider other)
+    /*private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.tag.Equals("Player"))
         {
             Player = null;
             StartCoroutine(ReturnToStationary());
         }
-    }
+    }*/
 
 
     #endregion
