@@ -77,15 +77,7 @@ public  class EnemyController : MonoBehaviour
     {
         
     }
-    //need to check the proper way to apply damage for Unity, probably not using this method
-   /* private void OnCollisionEnter(Collision collision)
-    {
-        if (collision == null) return;
-
-        GameObject CollidedObject = collision.gameObject;
-
-        
-    }*/
-
+ 
+  
     #endregion
 }

@@ -115,6 +115,7 @@ public class EnemyAIBase : MonoBehaviour
 
     private enum PatrolCategories
     {
+        StaticEnemy,
         None,
         Patrol,
         Roam
@@ -217,9 +218,13 @@ public class EnemyAIBase : MonoBehaviour
         #endregion
 
         #region Set a state (Chase, Patrol, or continue Idling)
-        if (bPlayerVisible)
+        if (bPlayerVisible && PatrolType != PatrolCategories.StaticEnemy)
         {
             CurrentState = EnemyStates.Chasing;
+        }
+        else if (bPlayerVisible && PatrolType == PatrolCategories.StaticEnemy)
+        {
+            CurrentState = EnemyStates.Attacking;
         }
         
        else if (bShouldPatrol)
@@ -259,7 +264,19 @@ public class EnemyAIBase : MonoBehaviour
         #endregion
 
         #region Process hit on player
-        if ( 
+
+        //first process for Static Enemies since it is less restrictive
+        if(PatrolType == PatrolCategories.StaticEnemy
+            && (Hit.collider == Player.GetComponent<Collider>())
+
+            && (Hit.collider != this.gameObject.GetComponent<Collider>())
+
+            && (Hit.distance <= RangedPerceptionDistance))
+                 {
+                      return true;
+                 }
+        //process hit for all other enemy types
+       else if ( 
             (Hit.collider == Player.GetComponent<Collider>())
 
             && (Hit.collider != this.gameObject.GetComponent<Collider>())
@@ -450,37 +467,68 @@ public class EnemyAIBase : MonoBehaviour
     /// <param name="CurrentAttackType"></param>
     private void AttackPlayer(AttackCategories CurrentAttackType)
     {
+    
         #region Check Player Can Be Attacked
-        bool bShouldChase = (CurrentState == EnemyStates.Attacking) && Vector3.Distance(EnemyPosition, PlayerPosition) > AttackDistance;
+        bool bShouldChase = 
+            (CurrentState == EnemyStates.Attacking) 
+            && Vector3.Distance(EnemyPosition, PlayerPosition) > AttackDistance
+            && PatrolType != PatrolCategories.StaticEnemy;
         if (bShouldChase)
         {
             //let the chasing state revert us to idle if the player is lost
             CurrentState = EnemyStates.Chasing;
         }
-        #endregion
+        //make another check in the case of a static enemy
+        bool bStaticEnemyIdle = 
+            (CurrentState == EnemyStates.Attacking) 
+            && Vector3.Distance(EnemyPosition, PlayerPosition) > RangedPerceptionDistance
+            && PatrolType == PatrolCategories.StaticEnemy;
+        if (bStaticEnemyIdle)
+        {
+            CurrentState = EnemyStates.Idle;
+        }
 
-        #region Process the Enemy's Attack Type
-        switch (CurrentAttackType)
+            #endregion
+
+            #region Process the Enemy's Attack Type
+            switch (CurrentAttackType)
         {
             case AttackCategories.Melee:
                 {
-                    //Melee method to be added later
+                    Melee();
                     break;
                 }
 
             case AttackCategories.Ranged:
                 {
-                    //Ranged method to be added later
+                    Ranged();
                     break;
                 }
             case AttackCategories.SelfDestruct:
                 {
-                    NavAgent.stoppingDistance = 0;
-                    //OnCollisionEnter will handle the rest of inflicting damage in this case
+                    SelfDestruct();
                     break;
                 }
         }
         #endregion
+    }
+
+    //Override me in your creature!
+    internal virtual void Melee()
+    {
+
+
+    }
+    //Override me in your creature!
+    internal virtual void Ranged()
+    {
+
+    }
+    //Override me in your creature!
+    internal virtual void SelfDestruct()
+    {
+        NavAgent.stoppingDistance = 0;
+        //OnCollisionEnter will handle the rest of inflicting damage in this case
     }
 
     /// <summary>
