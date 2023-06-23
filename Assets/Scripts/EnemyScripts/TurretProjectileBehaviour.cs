@@ -21,6 +21,10 @@ public class TurretProjectileBehaviour : MonoBehaviour
     {
         Destroy(gameObject);
     }*/
+/// <summary>
+/// when the bullet collides with the player it destroys itself
+/// </summary>
+/// <param name="other">The object the projectile is colliding with </param>
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.tag.Equals("Player"))
