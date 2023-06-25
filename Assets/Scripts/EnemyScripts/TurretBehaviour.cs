@@ -7,13 +7,6 @@ public class TurretBehaviour : EnemyAIBase
 
     #region Serialized Variables
 
-    /*[Header("Zone of Perception:")]
-    [Tooltip("The zone where the player is seen by the enemy")]
-    [SerializeField] private SphereCollider SphereCol;
-
-    [Tooltip("The radius of the sphere collider")]
-    [SerializeField] private float perceptionRadius;*/
-
     [Header("Object References:")]
     [Tooltip("The reference to the transform of the top piece of the turret")]
     [SerializeField] private Transform SkullTransform;
@@ -47,8 +40,6 @@ public class TurretBehaviour : EnemyAIBase
     #endregion
 
     #region Private variables
-    //active reference to the player
-   // private Transform Player;
 
     //reference to the rigidbody
     private Rigidbody rb;
@@ -64,11 +55,9 @@ public class TurretBehaviour : EnemyAIBase
     {
         base.Start();
 
-       // SphereCol.radius = perceptionRadius;
         StartRotation = SkullTransform.localRotation;
         startPosition = SkullTransform.localPosition;
         rb = GetComponent<Rigidbody>();
-       // Player = null;
     }
 
     internal override void Update()
@@ -77,7 +66,6 @@ public class TurretBehaviour : EnemyAIBase
     }
     internal override void Idle()
     {
-//        StartCoroutine(ReturnToStationary());
         base.Idle();
     }
     internal override void Ranged()
@@ -128,8 +116,8 @@ public class TurretBehaviour : EnemyAIBase
     {
         FakeFireball.gameObject.SetActive(true);
         float amount = 0;
-
-                while (SkullTransform.rotation != SkullUpPosition.rotation)//open the jaw
+        //open the jaw
+        while (SkullTransform.rotation != SkullUpPosition.rotation)
                 {
                     SkullTransform.position = Vector3.MoveTowards(SkullTransform.position, SkullUpPosition.position, firingSpeed * Time.deltaTime);
                     SkullTransform.rotation = Quaternion.RotateTowards(SkullTransform.rotation, SkullUpPosition.rotation, amount);
@@ -139,10 +127,12 @@ public class TurretBehaviour : EnemyAIBase
        //StartCoroutine(ChangeMouthPos(SkullUpPosition.rotation, SkullUpPosition.position)); doesn't work it gets out of sync
         yield return new WaitForSeconds(1f);
         FakeFireball.gameObject.SetActive(false);
-        Instantiate(Projectile, FakeFireball.transform.position, transform.rotation);//fire the bullet
+        //fire the bullet
+        Instantiate(Projectile, FakeFireball.transform.position, transform.rotation);
         yield return new WaitForSeconds(1f);
         //StartCoroutine(ChangeMouthPos(StartRotation * transform.rotation, startPosition + transform.position));
-                while (SkullTransform.rotation != StartRotation * transform.rotation)//close the jaw
+        //close the jaw
+        while (SkullTransform.rotation != StartRotation * transform.rotation)
                 {
                     SkullTransform.position = Vector3.MoveTowards(SkullTransform.position, startPosition + transform.position , firingSpeed * Time.deltaTime);
                     SkullTransform.rotation = Quaternion.RotateTowards(SkullTransform.rotation, StartRotation * transform.rotation, amount);
@@ -156,33 +146,6 @@ public class TurretBehaviour : EnemyAIBase
     #endregion
 
     #region Perception
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="other"></param>
-   /* private void OnTriggerEnter(Collider other)
-    {
-        if(other.gameObject.tag.Equals("Player"))
-        {
-            Player = other.transform;
-            StartCoroutine(FacePlayer());
-            
-        }
-    }*/
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="other"></param>
-    /*private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag.Equals("Player"))
-        {
-            Player = null;
-            StartCoroutine(ReturnToStationary());
-        }
-    }*/
-
-
+    //Perception inherited and performed as a part of EnemyAIBase
     #endregion
 }
