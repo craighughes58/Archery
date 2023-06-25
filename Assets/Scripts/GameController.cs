@@ -27,7 +27,7 @@ public class GameController : MonoBehaviour
     #endregion
 
     /// <summary>
-    /// 
+    /// This makes the method a singleton
     /// </summary>
     private void Awake()
     {
@@ -45,9 +45,9 @@ public class GameController : MonoBehaviour
 
     #region Scoring Information
     /// <summary>
-    /// 
+    /// this method updates the player's score
     /// </summary>
-    /// <param name="amount"></param>
+    /// <param name="amount">How many points the player gained</param>
     public void AddScore(int amount)
     {
         Score += amount;
@@ -58,7 +58,7 @@ public class GameController : MonoBehaviour
     #region Timer 
 
     /// <summary>
-    /// 
+    /// This coroutine is a timer that ticks down and then updates a member of the HUD that displays how much time is left
     /// </summary>
     /// <returns></returns>
     public IEnumerator TickDownTimer()
@@ -85,25 +85,25 @@ public class GameController : MonoBehaviour
 
     #region SpawningEnemies
     /// <summary>
-    /// 
+    /// This script adds newly made spawners to a list of all spawners in the level
     /// </summary>
-    /// <param name="sb"></param>
+    /// <param name="sb">The spawner behaviour being passed in</param>
     public void AddSpawner(SpawnerBehaviour sb)
     {
         Spawners.Add(sb);
     }
     /// <summary>
-    /// 
+    /// This script adds newly made spawners to a list of all spawners in the level and tracks what scene it's a part of
     /// </summary>
-    /// <param name="sb"></param>
-    /// <param name="scene"></param>
+    /// <param name="sb">The spawner behaviour being passed in</param>
+    /// <param name="scene">This determines if it's part of a scene where certain enemies need to be made</param>
     public void AddSpawner(SpawnerBehaviour sb, int scene)
     {
         
     }
 
     /// <summary>
-    /// 
+    /// This method triggers all spawners in the level to spawn enemies
     /// </summary>
     public void TriggerBasicSpawners()
     {

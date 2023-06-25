@@ -27,7 +27,7 @@ public class ZoneSpawnerBehaviour : SpawnerBehaviour
     void Start()
     {
         SpawnEnemy();
-        if(canRespawn)
+        if(canRespawn)//timed spawning
         {
             StartCoroutine(CheckRespawn());
         }
@@ -36,7 +36,10 @@ public class ZoneSpawnerBehaviour : SpawnerBehaviour
     #region Spawning
     
     /// <summary>
-    /// 
+    /// the method will wait a set amount of time then
+    /// it will check how many enemies are in range of the spawner
+    /// if there are no enemies in range it will spawn more
+    /// otherwise it restarts
     /// </summary>
     /// <returns></returns>
     public IEnumerator CheckRespawn()
@@ -69,7 +72,7 @@ public class ZoneSpawnerBehaviour : SpawnerBehaviour
     }
     
     /// <summary>
-    /// 
+    /// this will spawn N enemies where N is the amount of enemies allocated to this spawner
     /// </summary>
     public override void SpawnEnemy()
     {

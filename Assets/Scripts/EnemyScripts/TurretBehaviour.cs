@@ -43,11 +43,11 @@ public class TurretBehaviour : EnemyAIBase
 
     //reference to the rigidbody
     private Rigidbody rb;
-    //
+    //The starting rotation for the skull
     private Quaternion StartRotation;
-    //
+    //The starting position for the skull
     private Vector3 startPosition;
-    //
+    //true if the turret is looking at the player and false means it isnt
     private bool lockedOn;
     #endregion
     // Start is called before the first frame update
@@ -77,7 +77,8 @@ public class TurretBehaviour : EnemyAIBase
     #region Movement
 
     /// <summary>
-    /// 
+    /// This coroutine triggers when the player is found
+    /// it will slowly rotate to face the player and then once they can see the player un blocked, it will trigger the fire coroutine 
     /// </summary>
     /// <returns></returns>
     public void FacePlayer()
@@ -96,20 +97,12 @@ public class TurretBehaviour : EnemyAIBase
 
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerator ReturnToStationary()
-    {
-        yield return null;
-    }
     #endregion
 
     #region Attacking 
 
     /// <summary>
-    /// 
+    /// This script moves the turrets jaw to reveal a fireball then shoots a projectile and returns the jaw to its closed position
     /// </summary>
     /// <returns></returns>
     public IEnumerator Fire()
@@ -146,6 +139,8 @@ public class TurretBehaviour : EnemyAIBase
     #endregion
 
     #region Perception
+
     //Perception inherited and performed as a part of EnemyAIBase
+
     #endregion
 }
