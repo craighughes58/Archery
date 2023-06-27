@@ -122,7 +122,7 @@ NavMeshSettings:
     preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: f520373cf80d5cb4984d7b79f8bbf93d, type: 2}
 --- !u!4 &154583800 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2684312175388576324, guid: d4958227484245e4592c41ab2c02ad22, type: 3}
@@ -291,7 +291,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!64 &461174483
 MeshCollider:
@@ -509,6 +509,8 @@ GameObject:
   - component: {fileID: 733430083}
   - component: {fileID: 733430082}
   - component: {fileID: 733430085}
+  - component: {fileID: 733430086}
+  - component: {fileID: 733430087}
   m_Layer: 0
   m_Name: Turret
   m_TagString: Untagged
@@ -528,8 +530,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7018aeb9c7e42f2448b77cab90d7d53a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SphereCol: {fileID: 733430083}
-  perceptionRadius: 100
+  AttackType: 1
+  BaseDamage: 5
+  AttackDistance: 3
+  PatrolType: 0
+  PatrolPoints: []
+  PatrolDelay: 3
+  RandomDelayTime: 0
+  RandomDelayMaxTime: 0
+  RangedPerceptionDistance: 25
+  GeneralPerceptionRadius: 0
+  ChaseTime: 0
   SkullTransform: {fileID: 556629686208413845}
   JawTransform: {fileID: 8570961207936036347}
   Projectile: {fileID: 1809950512483219034, guid: 58c85530ae1eecd42842f6ea347c63e4, type: 3}
@@ -587,6 +598,47 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 14
   m_CollisionDetection: 0
+--- !u!195 &733430086
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733430081}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &733430087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 733430081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75ec674c561f78046bca6989b43be066, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Ammo: 0
+  Damage: 0
+  ShootFromLocation: {fileID: 0}
+  speed: 1
+  jumpForce: 1
+  gravityForce: 1
+  speedMultiplier: 0
 --- !u!1 &760968198
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,8 +1136,8 @@ GameObject:
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_NavMeshLayer: 1
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!65 &1292787164
 BoxCollider:

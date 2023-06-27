@@ -22,40 +22,40 @@ using UnityEngine.InputSystem.HID;
 public class EnemyAIBase : MonoBehaviour
 {
 
-    #region Private Variables
+    #region Internal Variables
 
     #region Serialized Fields
     #region Attack Settings
     [Header("Attack Settings")]
 
     [Tooltip("What kind of damage should the enemy inflict?")]
-    [SerializeField] private AttackCategories AttackType;
+    [SerializeField] internal AttackCategories AttackType;
 
     [Tooltip("This enemy's base damage to apply.")]
-    [SerializeField] private int BaseDamage = 5;
+    [SerializeField] internal int BaseDamage = 5;
 
     [Tooltip("The distance the enemy should stop at before reaching the player. This should change based on the enemy type.")]
-    [SerializeField] private int AttackDistance = 3;
+    [SerializeField] internal int AttackDistance = 3;
     #endregion
 
     #region Patrol Settings
     [Header("Patrol Settings")]
 
     [Tooltip("Set the patrol behavior type for this enemy")]
-    [SerializeField] private PatrolCategories PatrolType;
+    [SerializeField] internal PatrolCategories PatrolType;
 
     [Tooltip("By default, the patrol will be begin at the first index and loop through each point in the array.")]
-    [SerializeField]private Transform[] PatrolPoints;
+    [SerializeField]internal Transform[] PatrolPoints;
 
     [Tooltip("Time in seconds until next movement.")]
-    [SerializeField]private float PatrolDelay = 3;
+    [SerializeField]internal float PatrolDelay = 3;
 
     //[Tooltip("Randomize delay time?")]
     [SerializeField] 
-    private bool RandomDelayTime;
+    internal bool RandomDelayTime;
     // [Tooltip("Check that Randomize Delay Time is set to true. Maximum idle time between patrol points.")]
     [SerializeField]
-    private float RandomDelayMaxTime;
+    internal float RandomDelayMaxTime;
 
     #endregion
 
@@ -63,42 +63,42 @@ public class EnemyAIBase : MonoBehaviour
     [Header("Perception Settings")]
 
     [Tooltip("The forward distance the enemy can see to.")]
-    [SerializeField] private float RangedPerceptionDistance;
+    [SerializeField] internal float RangedPerceptionDistance;
 
     [Tooltip("The radial distance the enemy can see to.")]
-    [SerializeField] private float GeneralPerceptionRadius;
+    [SerializeField] internal float GeneralPerceptionRadius;
 
     [Tooltip("How long should the enemy pursue when the player escapes?")]
-    [SerializeField] private float ChaseTime = 0;
+    [SerializeField] internal float ChaseTime = 0;
     #endregion
     #endregion
 
     #region Non-Serialized Fields
 
     #region Objects & Custom Classes
-    private NavMeshAgent NavAgent;
-    private GameObject Player;
-    private Timer Timer;
+    internal NavMeshAgent NavAgent;
+    internal GameObject Player;
+    internal Timer Timer;
     #endregion
 
-    private int PatrolIndex = 0;
+    internal int PatrolIndex = 0;
 
     #region Booleans
-    private bool bShouldPatrol;
-    private bool bShouldAttack;
-    private bool bPlayerVisible;
+    internal bool bShouldPatrol;
+    internal bool bShouldAttack;
+    internal bool bPlayerVisible;
     #endregion
 
     #region Vectors
-    private Vector3 PlayerPosition;
-    private Vector3 EnemyPosition;
-    private Vector3 StartPosition;
+    internal Vector3 PlayerPosition;
+    internal Vector3 EnemyPosition;
+    internal Vector3 StartPosition;
     #endregion
 
-    private EnemyStates CurrentState;
+   internal EnemyStates CurrentState;
 
     #region Enums
-    private enum EnemyStates
+    internal enum EnemyStates
         {
             Idle,
             Patrolling,
@@ -106,14 +106,14 @@ public class EnemyAIBase : MonoBehaviour
             Attacking
         }
     
-    private enum AttackCategories
+    internal enum AttackCategories
     {
         Melee,
         Ranged,
         SelfDestruct
     }
 
-    private enum PatrolCategories
+    internal enum PatrolCategories
     {
         StaticEnemy,
         None,
@@ -127,7 +127,7 @@ public class EnemyAIBase : MonoBehaviour
     #endregion
 
     // Start is called before the first frame update
-    void Start()
+    internal virtual void Start()
     {
         //initial setup for our movement component
         NavAgent = GetComponent<NavMeshAgent>();
@@ -149,7 +149,7 @@ public class EnemyAIBase : MonoBehaviour
         Timer = gameObject.AddComponent<Timer>();
     }
 
-    private void OnDrawGizmos()
+    internal void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
        
@@ -158,7 +158,7 @@ public class EnemyAIBase : MonoBehaviour
 
 
     // Update is called once per frame
-    void Update()
+    internal virtual void Update()
     {
         //Makes sure our data is accurate for later checks
         UpdateVariables();
@@ -171,7 +171,7 @@ public class EnemyAIBase : MonoBehaviour
     /// A switch machine bringing us to the correct behavior based on the state information.
     /// </summary>
     /// <param name="CState"></param>
-    private void DecideState(EnemyStates CState)
+    internal void DecideState(EnemyStates CState)
     {
         //the logic of switching to a new state itself (ex. CState = EnemyStates.Patrolling)
         //occurs within other state functions as logic it becomes necessary.
@@ -210,7 +210,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Handles initial state changes when enemy become idle.
     /// Changes pending to reflect roaming system
     /// </summary>
-    private void Idle()
+    internal virtual void Idle()
     {
         #region Determine our factors
         //expression simplification bools
@@ -240,7 +240,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Long range detection TBD.
     /// </summary>
     /// <returns></returns>
-    private bool IsPlayerVisible()
+    internal bool IsPlayerVisible()
     {
         #region Check Player Exists
         //no player, no cast!
@@ -336,7 +336,7 @@ public class EnemyAIBase : MonoBehaviour
     /// <summary>
     /// Handles patrol behavior for the enemy.
     /// </summary>
-    private void Patrolling() 
+    internal void Patrolling() 
     {
         #region Safety catch for no Patrol Points set
         if (PatrolPoints == null)
@@ -414,7 +414,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Handles chase behavior for the enemy.
     /// </summary>
     /// <param name="BufferDistance"></param>
-    private void ChasePlayer(int BufferDistance)
+    internal void ChasePlayer(int BufferDistance)
     {
         #region Chase Timer & visibility check
         //stop the countdown if player returns to view
@@ -465,7 +465,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Handles attack behavior for the enemy.
     /// </summary>
     /// <param name="CurrentAttackType"></param>
-    private void AttackPlayer(AttackCategories CurrentAttackType)
+    internal void AttackPlayer(AttackCategories CurrentAttackType)
     {
     
         #region Check Player Can Be Attacked
@@ -535,7 +535,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Handles the collision processing for the Enemy. Handles final Self-Destruct processes.
     /// </summary>
     /// <param name="collision"></param>
-    private void OnCollisionEnter(Collision collision)
+    internal void OnCollisionEnter(Collision collision)
     {
         #region Safety Catch If No Collider
         if (collision.collider == null) return;
@@ -556,7 +556,7 @@ public class EnemyAIBase : MonoBehaviour
     /// <summary>
     /// Place any class scope variables w/ their checks here for per frame updating.
     /// </summary>
-    private void UpdateVariables()
+    internal void UpdateVariables()
     {
         EnemyPosition = this.transform.position;
         PlayerPosition = Player.transform.position;
