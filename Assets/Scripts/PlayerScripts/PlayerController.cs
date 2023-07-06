@@ -215,11 +215,17 @@ public class PlayerController : MonoBehaviour
     /// this creates a sphere below the player to check if the player is on the floor
     /// if the player is on the ground then the ground variable will be set to True
     /// otherwise it's set to False
+    /// if the object is grounded it will tell the gamecontroller the spot it's at 
     /// </summary>
     private void UpdateGround()
     {
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
         grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+        if (grounded)
+        {
+            GameObject.Find("GameController").GetComponent<GameController>().SetLastPlayerPosition(transform.position);
+        }
+        
     }
     /// <summary>
     /// This script calculates the next position of the camera based on the mouse's movement 
@@ -245,6 +251,7 @@ public class PlayerController : MonoBehaviour
     {
         currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);//the direction of the player 
         Vector3 velocity = ((transform.forward * (currentDir.y + BoostVector.z)) + (transform.right * (currentDir.x + BoostVector.x))) * speed + (Vector3.up * (yVelocity + BoostVector.y));//the speed at which the player is moving
+        Physics.SyncTransforms();
         CharCon.Move(velocity * Time.deltaTime);//move in relation to time, direction, and speed
     }
 

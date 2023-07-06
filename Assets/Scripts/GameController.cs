@@ -14,10 +14,12 @@ public class GameController : MonoBehaviour
     #endregion
 
     #region private variables
+    //How many points the player has acrewed
+    private int _Score = 0;
+    //The list of all spawners in the map
+    private List<SpawnerBehaviour> _Spawners = new List<SpawnerBehaviour>();
     //
-    private int Score = 0;
-    //
-    private List<SpawnerBehaviour> Spawners = new List<SpawnerBehaviour>();
+    private Vector3 _LastGroundedPos;
 
     #endregion
 
@@ -50,7 +52,7 @@ public class GameController : MonoBehaviour
     /// <param name="amount">How many points the player gained</param>
     public void AddScore(int amount)
     {
-        Score += amount;
+        _Score += amount;
     }
 
     #endregion
@@ -90,7 +92,7 @@ public class GameController : MonoBehaviour
     /// <param name="sb">The spawner behaviour being passed in</param>
     public void AddSpawner(SpawnerBehaviour sb)
     {
-        Spawners.Add(sb);
+        _Spawners.Add(sb);
     }
     /// <summary>
     /// This script adds newly made spawners to a list of all spawners in the level and tracks what scene it's a part of
@@ -107,7 +109,7 @@ public class GameController : MonoBehaviour
     /// </summary>
     public void TriggerBasicSpawners()
     {
-        foreach(SpawnerBehaviour x in Spawners)
+        foreach(SpawnerBehaviour x in _Spawners)
         {
             x.SpawnEnemy();
         }
@@ -120,6 +122,38 @@ public class GameController : MonoBehaviour
     public void TriggerSpawnerScene(int scene)
     {
 
+    }
+
+    /// <summary>
+    /// This method will be called whenever the player is grounded
+    /// it will set their last grounded position to where they are at in the map
+    /// </summary>
+    /// <param name="LastPos"></param>
+    public void SetLastPlayerPosition(Vector3 LastPos)
+    {
+        _LastGroundedPos = LastPos;
+    }
+
+    /// <summary>
+    /// if the trigger attached to the game controller is tripped
+    /// if it's a random object it's destroyed
+    /// if it's a player return them to their last grounded spot in the map
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnTriggerEnter(Collider other)
+    {
+        //if the object falling is the player return it to it's last grounded area
+        if (other.gameObject.tag.Equals("Player"))
+        {
+            
+            other.transform.position = _LastGroundedPos;
+            print(other.transform.position);
+        }
+        //otherwise destroy it to clean up
+        else
+        {
+            Destroy(other.gameObject);
+        }
     }
     #endregion
 }
