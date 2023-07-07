@@ -345,6 +345,7 @@ GameObject:
   - component: {fileID: 114672602}
   - component: {fileID: 114672604}
   - component: {fileID: 114672603}
+  - component: {fileID: 114672605}
   m_Layer: 0
   m_Name: TriangularWalkway (3)
   m_TagString: Untagged
@@ -416,6 +417,20 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 114672601}
+  m_Mesh: {fileID: 2534964839176971238, guid: 80d225adcef94854a8357de1ac14a767, type: 3}
+--- !u!64 &114672605
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114672601}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 2534964839176971238, guid: 80d225adcef94854a8357de1ac14a767, type: 3}
 --- !u!1 &137827885
 GameObject:
@@ -7225,6 +7240,7 @@ GameObject:
   - component: {fileID: 3506835271404122201}
   - component: {fileID: 505832025900810236}
   - component: {fileID: 2369426416984230710}
+  - component: {fileID: 4314757087816723172}
   m_Layer: 0
   m_Name: TriangularWalkway
   m_TagString: Untagged
@@ -7232,6 +7248,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!64 &4314757087816723172
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4314757087816723171}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2534964839176971238, guid: 80d225adcef94854a8357de1ac14a767, type: 3}
 --- !u!33 &4686983525415951716
 MeshFilter:
   m_ObjectHideFlags: 0
