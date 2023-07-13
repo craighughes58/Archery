@@ -114,7 +114,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("How many maximum points used to render line")]
         [SerializeField] [Range(10, 100)] private int _LinePoints = 25;
     [Tooltip("time distance between line segments - smaller = smoother")]
-        [SerializeField] [Range(0.01f, 0.25f)] private float _TimeBetweenPoints = 0.025f;
+        [SerializeField] [Range(0.01f, 0.25f)] private float _TimeBetweenPoints = 0.05f;
 
     private float _CurrentArrowForce;
     //
@@ -517,7 +517,7 @@ public class PlayerController : MonoBehaviour
         {
             //sets starting position of the predictive path line vector
             _ArrowPathPredictionLR.enabled = true;
-            _ArrowPathPredictionLR.positionCount = Mathf.CeilToInt(_LinePoints / _TimeBetweenPoints) + 1;
+            _ArrowPathPredictionLR.positionCount = Mathf.CeilToInt(_LinePoints / _TimeBetweenPoints) + 2;
             Vector3 startPosition = _ShootFrom.position;
             Vector3 startVelocity = _CameraRef.forward * (_CurrentArrowForce * _MaxArrowForce);
             int i = 0;
