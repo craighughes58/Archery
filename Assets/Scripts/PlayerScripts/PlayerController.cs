@@ -230,7 +230,7 @@ public class PlayerController : MonoBehaviour
         Vector3 SpherePosition = new Vector3(transform.position.x, transform.position.y - _GroundOffset, transform.position.z);
         _bGrounded = Physics.CheckSphere(SpherePosition, _GroundedRadius, _GroundLayers, QueryTriggerInteraction.Ignore);
 
-        if (grounded)
+        if (_bGrounded)
         {
             GameObject.Find("GameController").GetComponent<GameController>().SetLastPlayerPosition(transform.position);
         }
