@@ -223,11 +223,17 @@ public class PlayerController : MonoBehaviour
     /// Creates a sphere below the player to check if the player is on the floor
     /// if the player is on the ground then the ground variable will be set to True
     /// otherwise it's set to False
+    /// if the object is grounded it will tell the gamecontroller the spot it's at 
     /// </summary>
     private void UpdateGround()
     {
         Vector3 SpherePosition = new Vector3(transform.position.x, transform.position.y - _GroundOffset, transform.position.z);
         _bGrounded = Physics.CheckSphere(SpherePosition, _GroundedRadius, _GroundLayers, QueryTriggerInteraction.Ignore);
+
+        if (grounded)
+        {
+            GameObject.Find("GameController").GetComponent<GameController>().SetLastPlayerPosition(transform.position);
+        }
     }
 
 
@@ -258,8 +264,8 @@ public class PlayerController : MonoBehaviour
     {
         _CurrentDir = Vector3.SmoothDamp(_CurrentDir, _MoveInput, ref _CurrentDirVelocity, _MouseSmoothTime);//the direction of the player 
         Vector3 velocity = ((transform.forward * (_CurrentDir.y + _BoostVector.z)) + (transform.right * (_CurrentDir.x + _BoostVector.x))) * _PlayerSpeed + (Vector3.up * (_PlayerVelocityY + _BoostVector.y));//the speed at which the player is moving
-        _CharCon.Move(velocity * Time.deltaTime);//move in relation to time, direction, and speed
         Physics.SyncTransforms();
+        _CharCon.Move(velocity * Time.deltaTime);//move in relation to time, direction, and speed        
     }
 
 
