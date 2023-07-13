@@ -51,7 +51,7 @@ public class TurretBehaviour : EnemyAIBase
     private bool lockedOn;
     #endregion
     // Start is called before the first frame update
-    internal override void Start()
+    protected override void Start()
     {
         base.Start();
 
@@ -60,15 +60,15 @@ public class TurretBehaviour : EnemyAIBase
         rb = GetComponent<Rigidbody>();
     }
 
-    internal override void Update()
+    protected override void Update()
     {
         base.Update();
     }
-    internal override void Idle()
+    protected override void Idle()
     {
         base.Idle();
     }
-    internal override void Ranged()
+    protected override void Ranged()
     {
         base.Ranged();
         FacePlayer();
@@ -84,7 +84,7 @@ public class TurretBehaviour : EnemyAIBase
     public void FacePlayer()
     {
             //create new rotate closer to the player
-            Quaternion TargetRotation = Quaternion.LookRotation(PlayerPosition + new Vector3(0,yOffset,0) - transform.position);
+            Quaternion TargetRotation = Quaternion.LookRotation(_PlayerPosition + new Vector3(0,yOffset,0) - transform.position);
             //set current rotation to new rotation
             rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, TargetRotation, rotationSpeed));
             //lock us on!  
