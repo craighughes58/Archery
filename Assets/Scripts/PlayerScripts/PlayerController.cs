@@ -169,6 +169,8 @@ public class PlayerController : MonoBehaviour
         UpdateGround();//check if on the groung
         UpdateCameraRotation();//check if moving mouse
         UpdateMovement();//check if moving
+
+        //DrawArrowProjection();
         
     }
     private void FixedUpdate()
@@ -213,11 +215,17 @@ public class PlayerController : MonoBehaviour
     /// this creates a sphere below the player to check if the player is on the floor
     /// if the player is on the ground then the ground variable will be set to True
     /// otherwise it's set to False
+    /// if the object is grounded it will tell the gamecontroller the spot it's at 
     /// </summary>
     private void UpdateGround()
     {
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z);
         grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+        if (grounded)
+        {
+            GameObject.Find("GameController").GetComponent<GameController>().SetLastPlayerPosition(transform.position);
+        }
+        
     }
     /// <summary>
     /// This script calculates the next position of the camera based on the mouse's movement 
@@ -243,6 +251,7 @@ public class PlayerController : MonoBehaviour
     {
         currentDir = Vector3.SmoothDamp(currentDir, moveInput, ref currentDirVelocity, mouseSmoothTime);//the direction of the player 
         Vector3 velocity = ((transform.forward * (currentDir.y + BoostVector.z)) + (transform.right * (currentDir.x + BoostVector.x))) * speed + (Vector3.up * (yVelocity + BoostVector.y));//the speed at which the player is moving
+        Physics.SyncTransforms();
         CharCon.Move(velocity * Time.deltaTime);//move in relation to time, direction, and speed
     }
 
@@ -376,7 +385,7 @@ public class PlayerController : MonoBehaviour
         }
         else//if the arrow is pressed and has ammo elft
         {                
-            updateCharge(0);
+            updateCharge?.Invoke(0);
             if(!ammoSystem.QuiverIsEmpty())
             {
                 shotPressed = false;
@@ -386,7 +395,10 @@ public class PlayerController : MonoBehaviour
                 CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(arrowNum);
                 currentArrowForce = 0f;
                 ammoSystem.PullFromQuiver();
-                updateAmmo(ammoSystem.GetArrowCount());
+                updateAmmo?.Invoke(ammoSystem.GetArrowCount());
+
+                //need to get rid of this after I move path prediction into HUD properly -BMH
+                arrowPathPredictionLineRenderer.enabled = false;
             }
         }
     }
@@ -403,8 +415,13 @@ public class PlayerController : MonoBehaviour
             if(currentArrowForce < 1f)//ceiling
             {
                 currentArrowForce += Time.deltaTime;
-                updateCharge(currentArrowForce);
+                updateCharge?.Invoke(currentArrowForce);
             }
+
+            //will turn this into an invocation after I pull out the arrow path rendering code into its own script -BMH
+            DrawArrowProjection();
+
+
             yield return new WaitForSeconds(.01f);
         }
     }
@@ -424,7 +441,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             this.healthSystem.heal(healthAdd);
-            updateHealth(healthSystem.getCurrentHealth());
+            updateHealth?.Invoke(healthSystem.getCurrentHealth());
             return true;
         }
     }
@@ -436,31 +453,8 @@ public class PlayerController : MonoBehaviour
     public bool AddAmmo(int ammoAdd)
     {
         bool addArrowStatus = ammoSystem.AddToQuiver(ammoAdd);
-        updateAmmo(ammoSystem.GetArrowCount());
+        updateAmmo?.Invoke(ammoSystem.GetArrowCount());
         return addArrowStatus;
-
-
-        /*if (ammo == ammoMax)
-        {
-            //Debug.Log("AddAmmo called - ammo already full");
-            updateAmmo(ammoMax);
-            return false;
-        }
-        else if (ammo + ammoAdd >= ammoMax)
-        {
-            updateAmmo(ammoMax);
-            ammo = ammoMax;
-            //Debug.Log("AddAmmo called - ammo maxed out");
-            return true;
-        }
-        else
-        {
-            ammo += ammoAdd;
-            updateAmmo(ammo);
-            //
-            //+Debug.Log("AddAmmo called - ammo now " + ammo);
-            return true;
-        }*/
     }
 
     #endregion
@@ -476,7 +470,67 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region gizmos
+    #region gizmos & visualizations
+    //need to offload this to a separate script in the near term. BMH
+    [Header("Arrow Path Prediction Variables")]
+    [Tooltip("Mask to specify raycast ignoring")]
+    [SerializeField]
+    private LayerMask ArrowColliderMask;
+    [Tooltip("Preferred line renderer for visual path of arrow")]
+    [SerializeField]
+    private LineRenderer arrowPathPredictionLineRenderer;
+    [Tooltip("Arrow instantiation point (for purposes of start of flight path)")]
+    [SerializeField]
+    private Transform releasePosition;
+    [Tooltip("How many maximum points used to render line")]
+    [SerializeField]
+    [Range(10, 100)]
+    private int linePoints = 25;
+    [Tooltip("time distance between line segments - smaller = smoother")]
+    [SerializeField]
+    [Range(0.01f, 0.25f)]
+    private float timeBetweenPoints = 0.025f;
+
+    /// <summary>
+    /// Draws an arrow projection on request.
+    /// </summary>
+    private void DrawArrowProjection()
+    {
+        //checks to see if we should even be fuddling with rendering
+        if (currentArrowForce > 0)
+        {
+            //sets starting position of the predictive path line vector
+            arrowPathPredictionLineRenderer.enabled = true;
+            arrowPathPredictionLineRenderer.positionCount = Mathf.CeilToInt(linePoints / timeBetweenPoints) + 1;
+            Vector3 startPosition = ShootFrom.position;
+            Vector3 startVelocity = CameraRef.forward * (currentArrowForce * maxArrowForce);
+            int i = 0;
+            arrowPathPredictionLineRenderer.SetPosition(i, startPosition);
+
+            //runs forward, generating straight line segments forming a ballistic arc
+            for (float time = 0; time < linePoints; time += timeBetweenPoints)
+            {
+                i++;
+                Vector3 point = startPosition + time * startVelocity;
+                point.y = startPosition.y + startVelocity.y * time + (Physics.gravity.y / 2f * time * time);
+                arrowPathPredictionLineRenderer.SetPosition(i, point);
+
+                //checks to see if we're hitting a collidable object, if so, will stop this process
+                Vector3 lastPostition = arrowPathPredictionLineRenderer.GetPosition(i - 1);
+                if (Physics.Raycast(lastPostition, (point - lastPostition).normalized, out RaycastHit hit, (point - lastPostition).magnitude, ArrowColliderMask))
+                {
+                    arrowPathPredictionLineRenderer.SetPosition(i, hit.point);
+                    arrowPathPredictionLineRenderer.positionCount = i + 1;
+                    return;
+                }
+            }
+        }
+        else
+        {
+            arrowPathPredictionLineRenderer.enabled = false;
+        }
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - groundOffset, transform.position.z), GroundedRadius);
