@@ -98,7 +98,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7749453151114494639}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.422682, y: -26.364649, z: -12.745766}
+  m_LocalPosition: {x: 0, y: 1.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -169,31 +169,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2faec655d4fae3143a6c59f7b762bd5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CameraRef: {fileID: 7749453151446784989}
-  mouseSensitivity: 3.5
-  mouseSmoothTime: 0.03
-  speed: 5
-  jumpForce: 10
-  gravityForce: -15
-  speedMultiplier: 3
-  groundOffset: 0.8
-  GroundLayers:
+  _CameraRef: {fileID: 7749453151446784989}
+  _MouseSensitivity: 3.5
+  _MouseSmoothTime: 0.03
+  _PlayerSpeed: 5
+  _PlayerJumpForce: 10
+  _PlayerGravityForce: -15
+  _SpeedMultiplier: 3
+  _GroundOffset: 0.8
+  _GroundLayers:
     serializedVersion: 2
     m_Bits: 1
-  GroundedRadius: 0.3
-  maxArrowForce: 20
-  Arrow: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
-  ShootFrom: {fileID: 7749453151128540134}
-  maxGrappleSpeed: 10
-  GrappleLaunchOffset: {x: 0.25, y: 1}
-  GrappleLaunchForce: 1.75
-  ArrowColliderMask:
+  _GroundedRadius: 0.3
+  _MaxArrowForce: 20
+  _Arrow: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
+  _ShootFrom: {fileID: 7749453151128540134}
+  _MaxGrappleSpeed: 10
+  _GrappleLaunchOffset: {x: 0, y: 0}
+  _GrappleLaunchForce: 1.75
+  _ArrowColliderMask:
     serializedVersion: 2
     m_Bits: 1
-  arrowPathPredictionLineRenderer: {fileID: 7749453150647202898}
-  releasePosition: {fileID: 7749453151128540134}
-  linePoints: 25
-  timeBetweenPoints: 0.025
+  _ArrowPathPredictionLR: {fileID: 7749453150647202898}
+  _ReleasePosition: {fileID: 7749453151128540134}
+  _LinePoints: 25
+  _TimeBetweenPoints: 0.05
 --- !u!143 &7749453151114494626
 CharacterController:
   m_ObjectHideFlags: 0
@@ -765,6 +765,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUDCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 1369134166061500554, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 56.399902
+      objectReference: {fileID: 0}
+    - target: {fileID: 1369134166061500554, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -163.80005
+      objectReference: {fileID: 0}
     - target: {fileID: 1369134166244952768, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
       propertyPath: m_ReferenceResolution.x
       value: 1920
@@ -872,6 +880,18 @@ PrefabInstance:
     - target: {fileID: 1369134166405097627, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1369134166405097627, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1369134166419270115, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 57.100098
+      objectReference: {fileID: 0}
+    - target: {fileID: 1369134166419270115, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -57.69995
       objectReference: {fileID: 0}
     - target: {fileID: 1587057602697545914, guid: c6ceebd59a62c0a4b85c5d5361780496, type: 3}
       propertyPath: m_AnchorMax.x
