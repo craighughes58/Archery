@@ -1,13 +1,16 @@
-using System.Collections;
+/*************************************************************************
+ * Author: MaKayla Elder
+ * Date: 06.14.2023
+ * 
+ * Description:
+ * Custom inspector for Base enemy AI class.
+ * 
+ * 
+ * 
+ */
 using Unity.VisualScripting;
 using UnityEditor;
-using UnityEngine;
 
-
-
-
-//this is WIP. Idea is to make random max delay time float field only available if random delay time bool has been set to true
-//
 #region CustomEditor
 #if UNITY_EDITOR
 
@@ -21,7 +24,7 @@ public class EnemyAIBaseCustomerInspector : Editor
          SerializedProperty _BaseDamage;
          SerializedProperty _AttackDistance;
          SerializedProperty _PatrolType;
-         SerializedProperty _PatrolPoints;
+         SerializedProperty _PatrolRoute;
          SerializedProperty _PatrolDelay;
          SerializedProperty _bRandomDelayTime;
          SerializedProperty _RandomDelayMaxTime;
@@ -40,7 +43,7 @@ public class EnemyAIBaseCustomerInspector : Editor
         _BaseDamage = serializedObject.FindProperty("_BaseDamage");
         _AttackDistance = serializedObject.FindProperty("_AttackDistance");
         _PatrolType = serializedObject.FindProperty("_PatrolType");
-        _PatrolPoints = serializedObject.FindProperty("_PatrolPoints");
+        _PatrolRoute = serializedObject.FindProperty("_PatrolRoute");
         _PatrolDelay = serializedObject.FindProperty("_PatrolDelay");
         _bRandomDelayTime = serializedObject.FindProperty("_bRandomDelayTime");
         _RandomDelayMaxTime = serializedObject.FindProperty("_RandomDelayMaxTime");
@@ -72,7 +75,7 @@ public class EnemyAIBaseCustomerInspector : Editor
         if (_PatrolType.GetUnderlyingValue().ToString() == "Patrol" ||
             _PatrolType.GetUnderlyingValue().ToString() == "Roam")
         {
-            EditorGUILayout.PropertyField(_PatrolPoints);
+            EditorGUILayout.PropertyField(_PatrolRoute);
 
             _bRandomDelayTime.boolValue = EditorGUILayout.ToggleLeft("Randomize Patrol Delay?", _bRandomDelayTime.boolValue);
 

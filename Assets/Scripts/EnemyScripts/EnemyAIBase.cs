@@ -9,14 +9,8 @@
  * 
  */
 
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Assertions;
-using UnityEngine.InputSystem.HID;
 
 
 public class EnemyAIBase : MonoBehaviour
@@ -45,7 +39,7 @@ public class EnemyAIBase : MonoBehaviour
     [SerializeField] protected _PatrolCategories _PatrolType;
 
     [Tooltip("By default, the patrol will be begin at the first index and loop through each point in the array.")]
-    [SerializeField]protected Transform[] _PatrolPoints;
+    [SerializeField]protected WaypointContainer _PatrolRoute;
 
     [Tooltip("Time in seconds until next movement.")]
     [SerializeField]protected float _PatrolDelay = 3;
@@ -214,7 +208,7 @@ public class EnemyAIBase : MonoBehaviour
     {
         #region Determine our factors
         //expression simplification bools
-        _bShouldPatrol = (_PatrolType == _PatrolCategories.Patrol) || (_PatrolType == _PatrolCategories.Roam) && _PatrolPoints != null && _CurrentState == _EnemyStates.Idle;
+        _bShouldPatrol = (_PatrolType == _PatrolCategories.Patrol) || (_PatrolType == _PatrolCategories.Roam) && _PatrolRoute != null && _CurrentState == _EnemyStates.Idle;
         #endregion
 
         #region Set a state (Chase, Patrol, or continue Idling)
@@ -339,7 +333,7 @@ public class EnemyAIBase : MonoBehaviour
     protected void Patrolling() 
     {
         #region Safety catch for no Patrol Points set
-        if (_PatrolPoints == null)
+        if (_PatrolRoute == null)
         {
             return;
         }
@@ -356,14 +350,14 @@ public class EnemyAIBase : MonoBehaviour
         #endregion
 
         #region Setup Patrol Parameters
-        if ( (_PatrolIndex >  (_PatrolPoints.Length - 1) )|| (_PatrolIndex < 0) )
+        if ( (_PatrolIndex >  (_PatrolRoute._Waypoints.Count - 1) )|| (_PatrolIndex < 0) )
         {
             _PatrolIndex = 0; 
         }
 
         if(_PatrolType == _PatrolCategories.Roam)
         {
-            _PatrolIndex = Random.Range(0, _PatrolPoints.Length - 1);
+            _PatrolIndex = Random.Range(0, _PatrolRoute._Waypoints.Count - 1);
         }
 
         float Duration = _PatrolDelay;
@@ -374,7 +368,7 @@ public class EnemyAIBase : MonoBehaviour
             Duration = Random.Range(0, _RandomDelayMaxTime);        
         }
 
-        Vector3 PatrolDestination = _PatrolPoints[_PatrolIndex].transform.position;
+        Vector3 PatrolDestination = _PatrolRoute._Waypoints[_PatrolIndex].transform.position;
         #endregion
 
         #region Patrol
