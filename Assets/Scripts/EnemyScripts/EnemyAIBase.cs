@@ -143,12 +143,6 @@ public class EnemyAIBase : MonoBehaviour
         _Timer = gameObject.AddComponent<Timer>();
     }
 
-    protected void OnDrawGizmos()
-    {
-        Gizmos.color = Color.green;
-       
-        Gizmos.DrawRay(_EnemyPosition, this.transform.forward * _RangedPerceptionDistance);
-    }
 
 
     // Update is called once per frame
@@ -234,7 +228,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Long range detection TBD.
     /// </summary>
     /// <returns></returns>
-    protected bool IsPlayerVisible()
+    protected virtual bool IsPlayerVisible()
     {
         #region Check Player Exists
         //no player, no cast!
@@ -330,7 +324,7 @@ public class EnemyAIBase : MonoBehaviour
     /// <summary>
     /// Handles patrol behavior for the enemy.
     /// </summary>
-    protected void Patrolling() 
+    protected virtual void Patrolling() 
     {
         #region Safety catch for no Patrol Points set
         if (_PatrolRoute == null)
@@ -409,7 +403,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Handles chase behavior for the enemy.
     /// </summary>
     /// <param name="BufferDistance"></param>
-    protected void ChasePlayer(int BufferDistance)
+    protected virtual void ChasePlayer(int BufferDistance)
     {
         #region Chase Timer & visibility check
         //stop the countdown if player returns to view
@@ -460,7 +454,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Handles attack behavior for the enemy.
     /// </summary>
     /// <param name="CurrentAttackType"></param>
-    protected void AttackPlayer(_AttackCategories CurrentAttackType)
+    protected virtual void AttackPlayer(_AttackCategories CurrentAttackType)
     {
     
         #region Check Player Can Be Attacked
@@ -530,7 +524,7 @@ public class EnemyAIBase : MonoBehaviour
     /// Handles the collision processing for the Enemy. Handles final Self-Destruct processes.
     /// </summary>
     /// <param name="collision"></param>
-    protected void OnCollisionEnter(Collision collision)
+    protected virtual void OnCollisionEnter(Collision collision)
     {
         #region Safety Catch If No Collider
         if (collision.collider == null) return;
@@ -551,39 +545,10 @@ public class EnemyAIBase : MonoBehaviour
     /// <summary>
     /// Place any class scope variables w/ their checks here for per frame updating.
     /// </summary>
-    protected void UpdateVariables()
+    protected virtual void UpdateVariables()
     {
         _EnemyPosition = this.transform.position;
         _PlayerPosition = _Player.transform.position;
         _bPlayerVisible = IsPlayerVisible();
     }
-
-    //this is WIP. Idea is to make random max delay time float field only available if random delay time bool has been set to true
-    //
-    /*#region CustomEditor
-#if UNITY_EDITOR
-    [CustomEditor(typeof(EnemyAIBase))]
-    [CanEditMultipleObjects]
-    public class EnemyAIBaseEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
-
-            EnemyAIBase enemyAIBase = (EnemyAIBase)target;
-
-            if (enemyAIBase._bRandomDelayTime)
-            {
-               // EditorGUILayout.FloatField("Maximum random delay time", enemyAIBase._RandomDelayMaxTime);
-            }
-
-            /*using (new EditorGUI.DisabledScope(enemyAIBase._bRandomDelayTime == false))
-            {
-                enemyAIBase._RandomDelayMaxTime = EditorGUILayout.FloatField("Maximum random delay time", enemyAIBase._RandomDelayMaxTime);
-            }
-        }
-    }
-#endif
-    #endregion
-*/
 }
