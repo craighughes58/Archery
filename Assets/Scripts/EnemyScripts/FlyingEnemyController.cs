@@ -26,14 +26,22 @@ public class FlyingEnemyController : EnemyAIBase
 
     #region Movement
     //The enemy will have a list of points that it will patrol
-
+    protected override void Patrolling()
+    {
+        //base.Patrolling();
+    }
+    //The enemy will chase the player when in range 
+    protected override void ChasePlayer(int BufferDistance)
+    {
+        //base.ChasePlayer(BufferDistance);
+    }
     #endregion
 
     #region Attacking
     #endregion
 
-    #region Collisions
-    //if the enemy runs into a player switch states to attack mode
+    #region Collisions and Triggers
+    //if the enemy triggers from a player switch states to attack mode
 
     //if the player leaves the perception sphere switch back to patrol mode
     #endregion
