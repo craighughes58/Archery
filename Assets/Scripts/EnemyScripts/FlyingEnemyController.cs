@@ -44,5 +44,8 @@ public class FlyingEnemyController : EnemyAIBase
     //if the enemy triggers from a player switch states to attack mode
 
     //if the player leaves the perception sphere switch back to patrol mode
+
+    //if the enemy collides with the player then it self destructs 
+    
     #endregion
 }
