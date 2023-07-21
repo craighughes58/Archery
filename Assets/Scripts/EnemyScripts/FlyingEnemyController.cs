@@ -8,6 +8,8 @@ public class FlyingEnemyController : EnemyAIBase
 
     #endregion
     #region Private Variables
+    //The point where the enemy finds the player and departs from the patrol route
+    private Vector3 _FinalPatrolPoint;
     #endregion
 
     #region Start and Update
