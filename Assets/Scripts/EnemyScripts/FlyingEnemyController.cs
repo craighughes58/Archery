@@ -152,7 +152,7 @@ public class FlyingEnemyController : EnemyAIBase
             if (_Timer.bHasTimerCompleted())
             {
                 //do not set isStopped property to true, this will require an explicit call again to reverse to default state, isStopped=false
-                _NavAgent.destination = this.transform.position;
+                //_NavAgent.destination = this.transform.position; SET TO LAST PATROL POINT
                 _CurrentState = _EnemyStates.Idle;
                 //reset the timer for clean use!
                 _Timer.ResetTimer();
@@ -177,8 +177,8 @@ public class FlyingEnemyController : EnemyAIBase
 
         #region CHASE that player! 
         //fix all below
-        _NavAgent.stoppingDistance = BufferDistance;
-        _NavAgent.SetDestination(_PlayerPosition);
+       // _NavAgent.stoppingDistance = BufferDistance;
+       // _NavAgent.SetDestination(_PlayerPosition);
         #endregion
 
     }
