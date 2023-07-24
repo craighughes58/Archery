@@ -98,26 +98,17 @@ public class FlyingEnemyController : EnemyAIBase
             if (_Timer.bHasTimerCompleted())
             {
                 //Reset your timer or it will always return true for completed!!!
-                _Timer.ResetTimer();//CHANGE ALL BELOW
+                _Timer.ResetTimer();
                 //move on if both destination is reached and timer is completed
                 _PatrolIndex++;
-                transform.position = Vector3.MoveTowards(_EnemyPosition,PatrolDestination,_PatrollingSpeed);
-                transform.LookAt(PatrolDestination);
-                /*                
-                                _NavAgent.SetDestination(PatrolDestination);
-                                _NavAgent.stoppingDistance = 0;*/
             }
             //get a timer going when needed
             else if (!_Timer.bHasTimerStarted())
             {
                 //initial kick-off w/out a delay since default _NavAgent destination is itself
                 //making a custom assertion because the average difference is outside of == assertion epsilon
-                if ((_EnemyPosition - _StartPosition).magnitude < 1)//CHANGE
+                if ((_EnemyPosition - _StartPosition).magnitude < 1)
                 {
-                    // _NavAgent.SetDestination(PatrolDestination);
-                    //_NavAgent.stoppingDistance = 0;
-                    transform.position = Vector3.MoveTowards(_EnemyPosition, PatrolDestination, _PatrollingSpeed);
-                    transform.LookAt(PatrolDestination);
                     _PatrolIndex++;
                     return;
                 }
@@ -152,7 +143,6 @@ public class FlyingEnemyController : EnemyAIBase
             if (_Timer.bHasTimerCompleted())
             {
                 //do not set isStopped property to true, this will require an explicit call again to reverse to default state, isStopped=false
-                //_NavAgent.destination = this.transform.position; SET TO LAST PATROL POINT
                 _CurrentState = _EnemyStates.Idle;
                 //reset the timer for clean use!
                 _Timer.ResetTimer();
@@ -168,7 +158,7 @@ public class FlyingEnemyController : EnemyAIBase
         #endregion
 
         #region Check if we are in range to be Attacking
-        _bShouldAttack = (_CurrentState == _EnemyStates.Chasing) && _NavAgent.remainingDistance <= BufferDistance;
+        _bShouldAttack = (_CurrentState == _EnemyStates.Chasing);
         if (_bShouldAttack)
         {
             _CurrentState = _EnemyStates.Attacking;
@@ -177,8 +167,9 @@ public class FlyingEnemyController : EnemyAIBase
 
         #region CHASE that player! 
         //fix all below
-       // _NavAgent.stoppingDistance = BufferDistance;
-       // _NavAgent.SetDestination(_PlayerPosition);
+        transform.position = Vector3.MoveTowards(_EnemyPosition, _PlayerPosition, _ChasingSpeed);
+        transform.LookAt(_PlayerPosition);
+
         #endregion
 
     }
@@ -188,11 +179,11 @@ public class FlyingEnemyController : EnemyAIBase
     #endregion
 
     #region Collisions and Triggers
-    //if the enemy triggers from a player switch states to attack mode
-
-    //if the player leaves the perception sphere switch back to patrol mode
-
     //if the enemy collides with the player then it self destructs 
 
+    protected override void SelfDestruct()
+    {
+        //base.SelfDestruct();
+    }
     #endregion
 }

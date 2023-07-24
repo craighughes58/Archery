@@ -362,7 +362,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _AttackType: 2
   _BaseDamage: 5
-  _AttackDistance: 3
+  _AttackDistance: 1
   _PatrolType: 2
   _PatrolRoute: {fileID: 356703103}
   _PatrolDelay: 0
@@ -1019,7 +1019,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2faec655d4fae3143a6c59f7b762bd5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _CameraRef: {fileID: 0}
+  _CameraRef: {fileID: 963194228}
   _MouseSensitivity: 3.5
   _MouseSmoothTime: 0.03
   _PlayerSpeed: 5
