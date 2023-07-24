@@ -5,6 +5,13 @@ using UnityEngine;
 public class FlyingEnemyController : EnemyAIBase
 {
     #region Serialized Variables
+    [Header("Movement")]
+    [Tooltip("How fast the enemy moves when they are going to patrol points")]
+    [SerializeField] private float _PatrollingSpeed;
+
+    [Tooltip("How fast the enemy moves when they are going to the player")]
+    [SerializeField] private float _ChasingSpeed;
+
 
     #endregion
     #region Private Variables
@@ -44,7 +51,6 @@ public class FlyingEnemyController : EnemyAIBase
     protected override void Patrolling()
     {
         //base.Patrolling();
-
         #region Safety catch for no Patrol Points set
         if (_PatrolRoute == null)
         {
@@ -77,7 +83,6 @@ public class FlyingEnemyController : EnemyAIBase
 
         if (_bRandomDelayTime == true)
         {
-            Debug.Log("using random delay");
             Duration = Random.Range(0, _RandomDelayMaxTime);
         }
 
@@ -87,17 +92,20 @@ public class FlyingEnemyController : EnemyAIBase
         #region Patrol
 
         //check if we have reached the destination
-        if ((_NavAgent.remainingDistance < .5))//CHANGE ALL BELOW
+        if (((_EnemyPosition - PatrolDestination).magnitude < .5))
         {
             //check if a timer is running and if it is completed
             if (_Timer.bHasTimerCompleted())
             {
                 //Reset your timer or it will always return true for completed!!!
-                _Timer.ResetTimer();
+                _Timer.ResetTimer();//CHANGE ALL BELOW
                 //move on if both destination is reached and timer is completed
-                _NavAgent.SetDestination(PatrolDestination);
-                _NavAgent.stoppingDistance = 0;
                 _PatrolIndex++;
+                transform.position = Vector3.MoveTowards(_EnemyPosition,PatrolDestination,_PatrollingSpeed);
+                transform.LookAt(PatrolDestination);
+                /*                
+                                _NavAgent.SetDestination(PatrolDestination);
+                                _NavAgent.stoppingDistance = 0;*/
             }
             //get a timer going when needed
             else if (!_Timer.bHasTimerStarted())
@@ -106,14 +114,21 @@ public class FlyingEnemyController : EnemyAIBase
                 //making a custom assertion because the average difference is outside of == assertion epsilon
                 if ((_EnemyPosition - _StartPosition).magnitude < 1)//CHANGE
                 {
-                    _NavAgent.SetDestination(PatrolDestination);
-                    _NavAgent.stoppingDistance = 0;
+                    // _NavAgent.SetDestination(PatrolDestination);
+                    //_NavAgent.stoppingDistance = 0;
+                    transform.position = Vector3.MoveTowards(_EnemyPosition, PatrolDestination, _PatrollingSpeed);
+                    transform.LookAt(PatrolDestination);
                     _PatrolIndex++;
                     return;
                 }
 
                 _Timer.NewTimer(Duration);
             }
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(_EnemyPosition, PatrolDestination, _PatrollingSpeed);
+            transform.LookAt(PatrolDestination);
         }
         #endregion
     }

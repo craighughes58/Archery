@@ -326,6 +326,7 @@ public class EnemyAIBase : MonoBehaviour
     /// </summary>
     protected virtual void Patrolling() 
     {
+        print("THIS ALSO");
         #region Safety catch for no Patrol Points set
         if (_PatrolRoute == null)
         {
