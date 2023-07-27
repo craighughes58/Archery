@@ -26,7 +26,7 @@ public class HUDManager : MonoBehaviour
     private PlayerController player = null; //reference to player for pulling data at need
     private GameController controller = null; //reference to GameController for pulling data at need
     private int currentHealthVal = 0; //UNUSED ATM; need to use it for healthBarChange smoothing
-    private int maxHealth = 0; //used to bound healthbar; must change if maxHealth is expected to change
+    private float maxHealth = 0; //used to bound healthbar; must change if maxHealth is expected to change
     private int currentAmmoVal = 0; //used to store current helath
     private int maxAmmo = 0; //stores max arrow quiver size
     #endregion
