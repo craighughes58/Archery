@@ -13,16 +13,16 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     #region Delegate Events
-    public delegate void OnHealthChange(int health); //delegate event called for health status change
+    public delegate void OnHealthChange(float health); //delegate event called for health status change
     public event OnHealthChange onHealthChange; //CURRENTLY UNUSED
     #endregion
     
     #region Serialized Private Fields
     [Header("Health Fields")]
     [Tooltip("Maximum health of creature - cannot be exceeded")]
-    [SerializeField, Min(1)] private int maximumHealth = 10;
+    [SerializeField, Min(1)] private float maximumHealth = 10;
     [Tooltip("Current health of creature")]
-    [SerializeField, Min(1)] private int currentHealth = 10;
+    [SerializeField, Min(1)] private float currentHealth = 10;
     [Tooltip("percentage of damage reduction - cannot reduce damage below 1")]
     [SerializeField, Range(0,1)] private float damageReduction = 0;
     #endregion
@@ -33,7 +33,7 @@ public class Health : MonoBehaviour
     /// </summary>
     /// <param name="healAmount"></param>
     /// <returns></returns>
-    public void heal(int healAmount)
+    public void heal(float healAmount)
     {
         this.currentHealth = Mathf.Min(currentHealth + healAmount, maximumHealth);
         this.onHealthChange?.Invoke(this.currentHealth);
@@ -44,12 +44,12 @@ public class Health : MonoBehaviour
     /// </summary>
     /// <param name="damageAmount"></param>
     /// I would rename this to TakeDamage, it's a lil ambiguous -MKE
-    public void damage(int damageAmount) //might overload later to add "damage types"
+    public void damage(float damageAmount) //might overload later to add "damage types"
     {
-        int effectiveDamage = damageAmount;
+        float effectiveDamage = damageAmount;
         if (damageReduction > 0)
-        {
-            effectiveDamage = damageAmount - Mathf.RoundToInt(damageAmount * this.damageReduction);
+        { 
+            effectiveDamage = damageAmount - Mathf.Round(damageAmount * this.damageReduction);
             effectiveDamage = Mathf.Min(effectiveDamage, damageAmount - 1); //has to do at least 1 point of reduction
             effectiveDamage = Mathf.Max(effectiveDamage, 0); //can't deal negative damage)
         }
@@ -87,7 +87,7 @@ public class Health : MonoBehaviour
 
     #region Getters & Setters
     //setters
-    public void setMaximumHealth(int maximumHealth)
+    public void setMaximumHealth(float maximumHealth)
     {
         this.maximumHealth = Mathf.Max(maximumHealth, 1); //ensures you can't have empty or negative maxHealth
         if (this.maximumHealth < this.currentHealth)
@@ -107,8 +107,8 @@ public class Health : MonoBehaviour
     }
 
     //getters
-    public int getMaximumHealth() { return this.maximumHealth; }
-    public int getCurrentHealth() { return this.currentHealth; }
+    public float getMaximumHealth() { return this.maximumHealth; }
+    public float getCurrentHealth() { return this.currentHealth; }
     public float getCurrentDamageReduction() { return this.damageReduction; }
     #endregion
 
