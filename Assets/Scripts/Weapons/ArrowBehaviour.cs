@@ -60,7 +60,21 @@ public class ArrowBehaviour : WeaponBehaviorBase
             ThisRigidBody.useGravity = false;
             //ThisRigidBody.isKinematic = true;
 
+            if (collision.gameObject.tag.Equals("Enemy"))
+            {
+               EnemyController HitController = collision.gameObject.GetComponent<EnemyController>();
+
+                if (HitController != null) 
+                {
+                    HitController.TakeDamage(collision);
+                
+                }
+
+
+            }
+
         }
+        
 
     }
 
