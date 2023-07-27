@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     #region Delegate events
 
     //subscribable delegate event to notify relevant parties that health is changing; currently used by UI -BMH
-    public delegate void HealthUpdate(int newHealth);
+    public delegate void HealthUpdate(float newHealth);
     public static event HealthUpdate updateHealth;
 
     public delegate void AmmoUpdate(int newAmmo);
@@ -563,8 +563,8 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Getters
-    public int getMaxHealth() { return this._HealthSystem.getMaximumHealth(); }
-    public int getCurrHealth() { return this._HealthSystem.getCurrentHealth(); }
+    public float getMaxHealth() { return this._HealthSystem.getMaximumHealth(); }
+    public float getCurrHealth() { return this._HealthSystem.getCurrentHealth(); }
     public int getCurrAmmo() { return this._AmmoSystem.GetArrowCount(); }
     public int getMaxAmmo() { return this._AmmoSystem.GetQuiverSize(); }
     #endregion
