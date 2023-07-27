@@ -63,7 +63,7 @@ public class HUDManager : MonoBehaviour
     }
 
     //function to handle HUD changes to healthbar value
-    void healthBarChange(int newHealth)
+    void healthBarChange(float newHealth)
     {
         //next step will be using Mathf.Lerp to make the flow up / down "smooth" as opposed to instantaneus - BH
         if (newHealth >= maxHealth)
