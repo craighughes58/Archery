@@ -78,6 +78,13 @@ public  class EnemyController : MonoBehaviour
         
     }
  
+    internal virtual void TakeDamage(Collision collision)
+    {
+
+
+
+
+    }
   
     #endregion
 }
