@@ -18,6 +18,8 @@ public class ArrowBehaviour : WeaponBehaviorBase
     //private variables 
 
     //0 = normal, 1 = grapple
+   
+
     private int arrowType = 0;
 
     
@@ -66,7 +68,7 @@ public class ArrowBehaviour : WeaponBehaviorBase
 
                 if (HitController != null) 
                 {
-                    HitController.TakeDamage(collision);
+                    HitController.TakeDamage(collision, gameObject);
                 
                 }
 

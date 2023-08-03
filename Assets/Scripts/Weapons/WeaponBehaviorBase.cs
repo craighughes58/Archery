@@ -5,7 +5,9 @@ using UnityEngine;
 public class WeaponBehaviorBase : MonoBehaviour
 {
     #region Private Variables
-
+    [Header("Inflicting Damage Settings")]
+    [Tooltip("The Base Damage this weapon should inflict.")]
+    [SerializeField] protected float _BaseDamage = 1;
 
     //represents if the weapon has collided
     internal bool HasCollided;
@@ -32,6 +34,13 @@ public class WeaponBehaviorBase : MonoBehaviour
 
     internal virtual void OnCollisionEnter(Collision collision) 
     {
-        Debug.Log("Weapon Behavior base");
+   
+    }
+
+    internal virtual float GetInflictingDamage()
+    {
+
+
+        return _BaseDamage;
     }
 }

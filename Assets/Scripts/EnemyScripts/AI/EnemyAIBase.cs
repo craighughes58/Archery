@@ -30,6 +30,15 @@ public class EnemyAIBase : MonoBehaviour
 
     [Tooltip("The distance the enemy should stop at before reaching the player. This should change based on the enemy type.")]
     [SerializeField] protected int _AttackDistance = 3;
+
+    [Tooltip("Time delay until next attack.")]
+    [SerializeField] protected float _AttackDelay;
+
+    [Tooltip("Select a weapon prefab for the enemy to wield.")]
+    [SerializeField] private GameObject _Weapon;
+
+    [Tooltip("The transform location for projectile instantiation.")]
+    [ReadOnly] [SerializeField] protected Collider _ShootFromLocation;
     #endregion
 
     #region Patrol Settings
@@ -128,6 +137,17 @@ public class EnemyAIBase : MonoBehaviour
         _NavAgent.autoBraking = false;
         _NavAgent.speed = GetComponent<EnemyController>().speed;
 
+        //set our shoot-from location
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (Collider collider in colliders)
+        {
+            if (collider.name == "Shoot From Location")
+            {
+                _ShootFromLocation = collider;
+            }
+        }
+
+       
         //grab the player
         _Player = GameObject.FindGameObjectWithTag("Player");
         _PlayerPosition = _Player.transform.position;
@@ -141,6 +161,7 @@ public class EnemyAIBase : MonoBehaviour
 
         //REQUIRED for patrol and chase behaviors
         _Timer = gameObject.AddComponent<Timer>();
+
     }
 
 

@@ -33,11 +33,11 @@ public  class EnemyController : MonoBehaviour
 
     [SerializeField] private int Ammo;
 
-    [Tooltip("The amount of damage this enemy will inflict")]
-    [SerializeField] private int Damage;
+    [Header("Damage Modifiers")]
 
-    [Tooltip("The transform location for projectile instantiation.")]
-    [SerializeField] private Transform ShootFromLocation;
+    [SerializeField] protected float _DamageMultiplier = 1;
+
+
 
 
 
@@ -78,11 +78,16 @@ public  class EnemyController : MonoBehaviour
         
     }
  
-    internal virtual void TakeDamage(Collision collision)
+    internal virtual void TakeDamage(Collision collision, GameObject attacker)
     {
 
 
 
+
+    }
+
+    protected virtual void OnDeath(Collision collision, GameObject attacker)
+    {
 
     }
   

@@ -11,9 +11,9 @@
 using UnityEngine;
 
 
-public class GenericMovingEnemy : EnemyAIBase
+public class GenericMovingEnemyAI : EnemyAIBase
 {
-
+    
 
 
 
