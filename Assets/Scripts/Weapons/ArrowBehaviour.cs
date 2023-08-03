@@ -50,10 +50,10 @@ public class ArrowBehaviour : WeaponBehaviorBase
 
     private void OnCollisionEnter(Collision collision)
     {
-        base.OnCollisionEnter(collision);
-        Debug.Log("In Arrow Behavior");
+        //base.OnCollisionEnter(collision);
+        //Debug.Log("In Arrow Behavior");
 
-        if(!collision.gameObject.tag.Equals("Arrow"))
+        if(!collision.gameObject.tag.Equals("Arrow") && !collision.gameObject.tag.Equals("Player"))
         {
             HasCollided = true;
             ThisRigidBody.freezeRotation = true;

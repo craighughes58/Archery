@@ -183,6 +183,7 @@ MonoBehaviour:
   _GroundedRadius: 0.3
   _MaxArrowForce: 20
   _Arrow: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
+  _GrappleArrow: {fileID: 7707075399383919255, guid: 1c5453e8acf37e84199a4e0c602315e4, type: 3}
   _ShootFrom: {fileID: 7749453151128540134}
   _MaxGrappleSpeed: 10
   _GrappleLaunchOffset: {x: 0, y: 0}

@@ -84,6 +84,8 @@ public class PlayerController : MonoBehaviour
         [SerializeField] private float _MaxArrowForce = 20.0f; //default value
     [Tooltip("Reference to the arrow prefab")]
         [SerializeField] private GameObject _Arrow; //make reference to arrow prefab
+    [Tooltip("Reference to the grapple arrow prefab")]
+        [SerializeField] private GameObject _GrappleArrow; //make reference to grapple arrow prefab
     [Tooltip("where the arrow will come out")]
         [SerializeField] private Transform _ShootFrom; //reference to "ShootPos" component in Player->MainCamera->Bow_01
     [Tooltip("How much distance the player can cover while grappled")]
@@ -122,6 +124,8 @@ public class PlayerController : MonoBehaviour
     //
     private GameObject _CurrentArrow;
     //
+    private GameObject _CurrGrappleArrow;
+    //
     private LineRenderer _GrappleLineRenderer;
     //
     private Health _HealthSystem;
@@ -159,6 +163,7 @@ public class PlayerController : MonoBehaviour
         _PlayerVelocityY = 0f;
         _CurrentArrowForce = 0f;
         _CurrentArrow = null;
+        _CurrGrappleArrow = null;
         _bIsGrappled = false;
         _BoostVector = Vector3.zero;
     }
@@ -196,15 +201,15 @@ public class PlayerController : MonoBehaviour
     {
         _GrappleLineRenderer.SetPosition(0, transform.position);//starting points for line renderer
         _GrappleLineRenderer.SetPosition(1, transform.position);
-        if (_CurrentArrow != null && _CurrentArrow.GetComponent<ArrowBehaviour>().GetArrowType() == 1)//is grapple arrow out
+        if (_CurrGrappleArrow != null)//is grapple arrow out
         {
             _GrappleLineRenderer.SetPosition(0, _ShootFrom.position);//draw line to arrow
-            _GrappleLineRenderer.SetPosition(1, _CurrentArrow.transform.position);
-            if (_CurrentArrow.GetComponent<ArrowBehaviour>().GetCollided())//AND NOT COLLIDED WITH YET 
+            _GrappleLineRenderer.SetPosition(1, _CurrGrappleArrow.transform.position);
+            if (_CurrGrappleArrow.GetComponent<ArrowBehaviour>().GetCollided())//AND NOT COLLIDED WITH YET 
             {
                 _bIsGrappled = true;
 
-                Vector3 Offset = _CurrentArrow.transform.position - transform.position;
+                Vector3 Offset = _CurrGrappleArrow.transform.position - transform.position;
 
                 if (Offset.magnitude > .1f)
                 {
@@ -310,9 +315,9 @@ public class PlayerController : MonoBehaviour
         {
             if (_bIsGrappled)// if grappled end grapple and jump midair
             {
-                PullPlayer(_CurrentArrow.transform);
+                PullPlayer(_CurrGrappleArrow.transform);
                 //add forward force
-                _CurrentArrow = null;
+                _CurrGrappleArrow = null;
                 _bIsGrappled = false;
             }
             _bIsJumping = true;
@@ -392,7 +397,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="value">The button pressed by the player</param>
     private void OnSecondaryShoot(InputValue value)
     {
-        LoadArrow(value, 1);
+        LoadGrappleArrow(value);
     }
 
 
@@ -405,7 +410,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="arrowNum">0 = normal, 1 = grapple</param>
     private void LoadArrow(InputValue value, int arrowNum)
     {
-        if (value.isPressed)// if the arrow is  pressed and has ammo left
+        if (value.isPressed && !_bShotPressed)// if the arrow is  pressed and has ammo left
         {
             if (!_AmmoSystem.QuiverIsEmpty())
             {
@@ -419,7 +424,7 @@ public class PlayerController : MonoBehaviour
             if (!_AmmoSystem.QuiverIsEmpty())
             {
                 _bShotPressed = false;
-                _bIsGrappled = false;//shoot the arrow
+                //_bIsGrappled = false;//shoot the arrow
                 _CurrentArrow = Instantiate(_Arrow, _ShootFrom.position, _CameraRef.rotation);
                 _CurrentArrow.GetComponent<Rigidbody>().velocity = _CameraRef.forward * (_CurrentArrowForce * _MaxArrowForce);
                 _CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(arrowNum);
@@ -430,6 +435,30 @@ public class PlayerController : MonoBehaviour
                 //need to get rid of this after I move path prediction into HUD properly -BMH
                 _ArrowPathPredictionLR.enabled = false;
             }
+        }
+    }
+
+
+
+    private void LoadGrappleArrow(InputValue value)
+    {
+        if (value.isPressed && !_bShotPressed)// if the arrow is  pressed and has ammo left
+        {
+            _bShotPressed = true;
+            StartCoroutine(chargeShot()); //start charging the arrow
+        }
+        else//if the arrow is pressed and has ammo elft
+        {
+            updateCharge?.Invoke(0);
+            _bShotPressed = false;
+            _bIsGrappled = false;//shoot the arrow
+            _CurrGrappleArrow = Instantiate(_GrappleArrow, _ShootFrom.position, _CameraRef.rotation);
+            _CurrGrappleArrow.GetComponent<Rigidbody>().velocity = _CameraRef.forward * (_CurrentArrowForce * _MaxArrowForce);
+            _CurrGrappleArrow.GetComponent<ArrowBehaviour>().setArrowType(1);
+            _CurrentArrowForce = 0f;
+
+            //need to get rid of this after I move path prediction into HUD properly -BMH
+            _ArrowPathPredictionLR.enabled = false;
         }
     }
 
