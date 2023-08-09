@@ -9,7 +9,7 @@
  * Use notes:
  * 
  * Use bHasTimerStarted to determine if a timer is running. After starting a timer, use bHasTimerCompleted to check if finished.
- * bool started changes to false when timer is completed, so this may be more useful to check if looping timers
+ * bool 'started' changes to false when timer is completed, so this may be more useful to check if looping timers
  * Use StopTimer() or ResetTimer() to stop Timer, ResetTimer() has the added benefit of setting the time to 0;
  *Be sure to use ResetTimer() when a particular operation no longer needs it
  *This will ensure a clean timer for the next use.
@@ -51,8 +51,11 @@ public class Timer : MonoBehaviour
             {
                 yield break;
             }
-            timer -= Time.deltaTime;
-            
+            if ((timer -= Time.deltaTime) < 0)
+            {
+                timer = 0;
+            }
+            else timer -= Time.deltaTime;
             yield return new WaitForSeconds(Time.deltaTime);
         }
         if (!stopped)
@@ -77,7 +80,7 @@ public class Timer : MonoBehaviour
         stopped = true;
         started = false;
         completed = false;
-        timer = 0;
+        timer = 0; 
     }
     public void ResumeTimer()
     {
@@ -98,6 +101,7 @@ public class Timer : MonoBehaviour
         timer = Duration;
         StartCoroutine(TickDownTimer());
     }
+
     public bool bHasTimerStarted()
     {
         return started;

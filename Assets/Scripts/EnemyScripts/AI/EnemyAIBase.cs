@@ -9,9 +9,9 @@
  * 
  */
 
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-
 
 public class EnemyAIBase : MonoBehaviour
 {
@@ -32,13 +32,10 @@ public class EnemyAIBase : MonoBehaviour
     [SerializeField] protected int _AttackDistance = 3;
 
     [Tooltip("Time delay until next attack.")]
-    [SerializeField] protected float _AttackDelay;
-
-    [Tooltip("Select a weapon prefab for the enemy to wield.")]
-    [SerializeField] private GameObject _Weapon;
+    [SerializeField] protected float _AttackDelay = 1;
 
     [Tooltip("The transform location for projectile instantiation.")]
-    [ReadOnly] [SerializeField] protected Collider _ShootFromLocation;
+    [ReadOnly] [SerializeField] internal Collider _ShootFromLocation;
     #endregion
 
     #region Patrol Settings
@@ -78,6 +75,7 @@ public class EnemyAIBase : MonoBehaviour
     protected NavMeshAgent _NavAgent;
     protected GameObject _Player;
     protected Timer _Timer;
+    protected WeaponBehaviorBase _Weapon;
     #endregion
 
     protected int _PatrolIndex = 0;
@@ -86,6 +84,7 @@ public class EnemyAIBase : MonoBehaviour
     protected bool _bShouldPatrol;
     protected bool _bShouldAttack;
     protected bool _bPlayerVisible;
+    internal bool IsInitialized;
     //must be made public so the custom inspector can read/write this value
     public bool _bRandomDelayTime;
 
@@ -95,6 +94,7 @@ public class EnemyAIBase : MonoBehaviour
     protected Vector3 _PlayerPosition;
     protected Vector3 _EnemyPosition;
     protected Vector3 _StartPosition;
+    protected Vector3 _PlayerCrossProduct;
     #endregion
 
    protected _EnemyStates _CurrentState;
@@ -146,7 +146,8 @@ public class EnemyAIBase : MonoBehaviour
                 _ShootFromLocation = collider;
             }
         }
-
+        //grab the weapon
+        _Weapon = _ShootFromLocation.GetComponentInChildren<WeaponBehaviorBase>(); 
        
         //grab the player
         _Player = GameObject.FindGameObjectWithTag("Player");
@@ -161,6 +162,8 @@ public class EnemyAIBase : MonoBehaviour
 
         //REQUIRED for patrol and chase behaviors
         _Timer = gameObject.AddComponent<Timer>();
+
+        IsInitialized = true;
 
     }
 
@@ -246,7 +249,6 @@ public class EnemyAIBase : MonoBehaviour
 
     /// <summary>
     /// Checks if the player is visible within long or close range.
-    /// Long range detection TBD.
     /// </summary>
     /// <returns></returns>
     protected virtual bool IsPlayerVisible()
@@ -272,10 +274,18 @@ public class EnemyAIBase : MonoBehaviour
         }
         #endregion
 
+        //we want to fill the cross product here as a part of our visibility checks every frame
+        //other functions rely on this information, so do not remove
+        //justification here is because visibility checks are done every frame
+        _PlayerCrossProduct = Vector3.Cross(_EnemyPosition.normalized, _PlayerPosition.normalized);
+
+
         #region Process hit on player
 
+
+
         //first process for Static Enemies since it is less restrictive
-        if(_PatrolType == _PatrolCategories.StaticEnemy
+        if (_PatrolType == _PatrolCategories.StaticEnemy
             && (Hit.collider == _Player.GetComponent<Collider>())
 
             && (Hit.collider != this.gameObject.GetComponent<Collider>())
@@ -294,8 +304,6 @@ public class EnemyAIBase : MonoBehaviour
 
             )
         {
-            //we want the cross product because we can use other information in this vector to affect our rotation later on
-            Vector3 CrossProduct = Vector3.Cross(_EnemyPosition.normalized, _PlayerPosition.normalized);
 
             #region Rotational Checks (Currently COMMENTED and UNUSED)
             //future rotational checks if desired
@@ -318,7 +326,7 @@ public class EnemyAIBase : MonoBehaviour
 
             #region Visibility Range Check
             //if the x vector is positive, we are in front of the enemy
-            if (CrossProduct.x > 0)
+            if (_PlayerCrossProduct.x > 0)
             {
                 return true;
             }
@@ -379,7 +387,6 @@ public class EnemyAIBase : MonoBehaviour
 
         if (_bRandomDelayTime == true) 
         {
-            Debug.Log("using random delay");
             Duration = Random.Range(0, _RandomDelayMaxTime);        
         }
 
@@ -477,7 +484,6 @@ public class EnemyAIBase : MonoBehaviour
     /// <param name="CurrentAttackType"></param>
     protected virtual void AttackPlayer(_AttackCategories CurrentAttackType)
     {
-    
         #region Check Player Can Be Attacked
         bool bShouldChase = 
             (_CurrentState == _EnemyStates.Attacking) 
@@ -487,6 +493,9 @@ public class EnemyAIBase : MonoBehaviour
         {
             //let the chasing state revert us to idle if the player is lost
             _CurrentState = _EnemyStates.Chasing;
+            _Timer.ResetTimer();
+
+
         }
         //make another check in the case of a static enemy
         bool bStaticEnemyIdle = 
@@ -496,29 +505,40 @@ public class EnemyAIBase : MonoBehaviour
         if (bStaticEnemyIdle)
         {
             _CurrentState = _EnemyStates.Idle;
+            _Timer.ResetTimer();
         }
+        #endregion
 
-            #endregion
+        #region Process the Enemy's Attack Type
+        float TimeLeft = _Timer.GetTimeLeft();
 
-            #region Process the Enemy's Attack Type
-            switch (CurrentAttackType)
+        if (TimeLeft > 0)
         {
-            case _AttackCategories.Melee:
-                {
-                    Melee();
-                    break;
-                }
+            return;
+        }
+        else if (TimeLeft <= 0)
+        {
+            _Timer.NewTimer(_AttackDelay);
+            Debug.Log("attacking");
+            switch (CurrentAttackType)
+            {
+                case _AttackCategories.Melee:
+                    {
+                        Melee();
+                        break;
+                    }
 
-            case _AttackCategories.Ranged:
-                {
-                    Ranged();
-                    break;
-                }
-            case _AttackCategories.SelfDestruct:
-                {
-                    SelfDestruct();
-                    break;
-                }
+                case _AttackCategories.Ranged:
+                    {
+                        Ranged();
+                        break;
+                    }
+                case _AttackCategories.SelfDestruct:
+                    {
+                        SelfDestruct();
+                        break;
+                    }
+            }
         }
         #endregion
     }
@@ -572,4 +592,5 @@ public class EnemyAIBase : MonoBehaviour
         _PlayerPosition = _Player.transform.position;
         _bPlayerVisible = IsPlayerVisible();
     }
+
 }

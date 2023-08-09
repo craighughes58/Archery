@@ -174,6 +174,7 @@ MonoBehaviour:
   _AttackType: 0
   _BaseDamage: 5
   _AttackDistance: 3
+  _AttackDelay: 1
   _ShootFromLocation: {fileID: 0}
   _PatrolType: 0
   _PatrolRoute: {fileID: 0}

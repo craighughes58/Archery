@@ -16,21 +16,22 @@ using UnityEditor;
 
 [CustomEditor(typeof(EnemyAIBase))]
 [CanEditMultipleObjects]
-public class EnemyAIBaseCustomerInspector : Editor
+public class EnemyAIBaseCustomInspector : Editor
 {
     //create all the serialized properties to match our serialized fields to display
     #region Serialized Properties
-         SerializedProperty _AttackType;
-         SerializedProperty _BaseDamage;
-         SerializedProperty _AttackDistance;
-         SerializedProperty _PatrolType;
-         SerializedProperty _PatrolRoute;
-         SerializedProperty _PatrolDelay;
-         SerializedProperty _bRandomDelayTime;
-         SerializedProperty _RandomDelayMaxTime;
-         SerializedProperty _RangedPerceptionDistance;
-         SerializedProperty _GeneralPerceptionRadius;
-        SerializedProperty _ChaseTime;
+    SerializedProperty _AttackType;
+    SerializedProperty _BaseDamage;
+    SerializedProperty _AttackDistance;
+    SerializedProperty _PatrolType;
+    SerializedProperty _PatrolRoute;
+    SerializedProperty _PatrolDelay;
+    SerializedProperty _bRandomDelayTime;
+    SerializedProperty _RandomDelayMaxTime;
+    SerializedProperty _RangedPerceptionDistance;
+    SerializedProperty _GeneralPerceptionRadius;
+    SerializedProperty _ChaseTime;
+    SerializedProperty _AttackDelay;
 
     #endregion
 
@@ -50,6 +51,7 @@ public class EnemyAIBaseCustomerInspector : Editor
         _RangedPerceptionDistance = serializedObject.FindProperty("_RangedPerceptionDistance");
         _GeneralPerceptionRadius = serializedObject.FindProperty("_GeneralPerceptionRadius");
         _ChaseTime = serializedObject.FindProperty("_ChaseTime");
+        _AttackDelay = serializedObject.FindProperty("_AttackDelay");
 
         #endregion
     }
@@ -61,6 +63,7 @@ public class EnemyAIBaseCustomerInspector : Editor
         //display attack settings
         EditorGUILayout.PropertyField(_AttackType);
         EditorGUILayout.PropertyField(_BaseDamage);
+        EditorGUILayout.PropertyField(_AttackDelay);
         if (_PatrolType.GetUnderlyingValue().ToString() != "StaticEnemy")
         {
             EditorGUILayout.PropertyField(_AttackDistance);

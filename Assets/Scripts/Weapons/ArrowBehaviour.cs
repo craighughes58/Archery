@@ -30,13 +30,11 @@ public class ArrowBehaviour : WeaponBehaviorBase
     void Start()
     {
         ThisRigidBody = GetComponent<Rigidbody>();
-        //GetComponent<Rigidbody>().centerOfMass = Vector3.back;
     }
 
     // Update is called once per frame
     void Update()
     {
-        //transform.rotation = Quaternion.LookRotation(ThisRigidBody.velocity);
     }
     private void FixedUpdate()
     {
@@ -50,17 +48,15 @@ public class ArrowBehaviour : WeaponBehaviorBase
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    internal override void OnCollisionEnter(Collision collision)
     {
         base.OnCollisionEnter(collision);
-        Debug.Log("In Arrow Behavior");
 
         if(!collision.gameObject.tag.Equals("Arrow"))
         {
             HasCollided = true;
             ThisRigidBody.freezeRotation = true;
             ThisRigidBody.useGravity = false;
-            //ThisRigidBody.isKinematic = true;
 
             if (collision.gameObject.tag.Equals("Enemy"))
             {
@@ -72,6 +68,13 @@ public class ArrowBehaviour : WeaponBehaviorBase
                 
                 }
 
+
+            }
+            else if (collision.gameObject.tag.Equals("Player"))
+            {
+                Health PlayerHealthSystem = collision.gameObject.GetComponent<Health>();
+
+                PlayerHealthSystem.damage(GetInflictingDamage());
 
             }
 

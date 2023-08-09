@@ -14,8 +14,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Health))]
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof (EnemyAIBase))]
+
 //******Re-implement abstract keyword when base class complete!
-public  class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour
 {
 
     #region Public variables
