@@ -25,6 +25,8 @@ public class Health : MonoBehaviour
     [SerializeField, Min(1)] private float currentHealth = 10;
     [Tooltip("percentage of damage reduction - cannot reduce damage below 1")]
     [SerializeField, Range(0,1)] private float damageReduction = 0;
+    [Tooltip("If this bool is true then it signifies that his class is for the player")]
+    [SerializeField] private bool bIsPlayer;
     #endregion
 
     #region Methods
@@ -56,6 +58,11 @@ public class Health : MonoBehaviour
 
         this.currentHealth = Mathf.Max(0, this.currentHealth - effectiveDamage); //updates health, bounded to zero
         this.onHealthChange?.Invoke(currentHealth); //notify relevant parties health has changed 
+
+        if(bIsPlayer && this.currentHealth <= 0)
+        {
+            GetComponent<PlayerController>().NoteDeath();
+        }
 
     }
 

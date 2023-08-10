@@ -568,4 +568,14 @@ public class PlayerController : MonoBehaviour
     public int getCurrAmmo() { return this._AmmoSystem.GetArrowCount(); }
     public int getMaxAmmo() { return this._AmmoSystem.GetQuiverSize(); }
     #endregion
+
+    #region GameController Contact
+    /// <summary>
+    /// When the player reaches zero health then tell this is called from health to tell the gamecontroller that the end condition has been reached
+    /// </summary>
+    public void NoteDeath()
+    {
+        GameObject.Find("GameController").GetComponent<GameController>().ShowLossScreen();
+    }
+    #endregion
 }
