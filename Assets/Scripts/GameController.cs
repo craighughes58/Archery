@@ -26,6 +26,12 @@ public class GameController : MonoBehaviour
     #region Serialized Fields
     [Tooltip("How much time a player has in a round")]
     [SerializeField] private float timer;
+
+    [Tooltip("The menu that appears when the player dies")]
+    [SerializeField] private Canvas LossCanvas;
+
+    [Tooltip("The music that plays in the background")]
+    [SerializeField] private AudioSource ThemeMusic;
     #endregion
 
     /// <summary>
@@ -41,9 +47,10 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //LossCanvas.enabled = false;
+        //LossCanvas.enabled = false;
         StartCoroutine(TickDownTimer());
     }
-
 
     #region Scoring Information
     /// <summary>
@@ -156,4 +163,21 @@ public class GameController : MonoBehaviour
         }
     }
     #endregion
+
+    #region Loss Menu
+    /// <summary>
+    /// When the player reaches the loss condition this method shows the screen
+    /// </summary>
+    public void ShowLossScreen()
+    {
+        //reactivate mouse
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        //pause music
+        ThemeMusic.Pause();
+        //show canvas
+        LossCanvas.enabled = true;
+    }
+    #endregion
 }
+
