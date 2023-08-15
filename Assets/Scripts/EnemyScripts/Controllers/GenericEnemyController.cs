@@ -75,8 +75,8 @@ public class GenericEnemyController : EnemyController
                 foreach (Collider c2 in _Colliders)
                 {
                     Physics.IgnoreCollision(c1, c2);
-                    Physics.IgnoreCollision(c1, Plane);
                 }
+                Physics.IgnoreCollision(c1, Plane);
             }
             #endregion
         }
@@ -105,6 +105,14 @@ public class GenericEnemyController : EnemyController
 
         base.TakeDamage(collision, attacker);
 
+        Debug.Log("attacker is " + attacker.transform.root.tag);
+
+        if (attacker.transform.root.CompareTag("Enemy"))
+        {
+            return;
+        }
+
+
         #region Apply Damage w/ Area of Damage Adjustments
         if (_Head != null && _Body != null) 
         {
@@ -120,7 +128,10 @@ public class GenericEnemyController : EnemyController
             }
             else if (collision.collider == _Body)
             {
-                _Health.damage(weaponBehavior.GetInflictingDamage());
+                if(weaponBehavior != null)
+                {
+                    _Health.damage(weaponBehavior.GetInflictingDamage());
+                }
             }
         }
         #endregion

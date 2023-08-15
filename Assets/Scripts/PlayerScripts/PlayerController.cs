@@ -421,6 +421,7 @@ public class PlayerController : MonoBehaviour
                 _bShotPressed = false;
                 _bIsGrappled = false;//shoot the arrow
                 _CurrentArrow = Instantiate(_Arrow, _ShootFrom.position, _CameraRef.rotation);
+                //_CurrentArrow.transform.SetParent(transform, true);
                 _CurrentArrow.GetComponent<Rigidbody>().velocity = _CameraRef.forward * (_CurrentArrowForce * _MaxArrowForce);
                 _CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(arrowNum);
                 _CurrentArrowForce = 0f;

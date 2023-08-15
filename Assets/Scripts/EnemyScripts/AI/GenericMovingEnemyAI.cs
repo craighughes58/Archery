@@ -9,7 +9,7 @@
 
 
 using UnityEngine;
-
+using UnityEngine.AI;
 
 public class GenericMovingEnemyAI : EnemyAIBase
 {
@@ -18,15 +18,19 @@ public class GenericMovingEnemyAI : EnemyAIBase
     [Tooltip("The rate at which the enemy should turn to face the player.")]
     [SerializeField] protected float _RotationSpeed = 2;
 
-    protected Rigidbody _RigidBody;
+    [SerializeField] protected Rigidbody _RigidBody;
 
     protected override void AttackPlayer(_AttackCategories CurrentAttackType)
     {
        
         FacePlayer();
-       if((_PlayerCrossProduct.y > -0.8) && (_PlayerCrossProduct.y < .8) && (_PlayerCrossProduct.x > 0))
+
+        Vector3 PlayerDirection = _EnemyPosition - _PlayerPosition;
+        float AngleToPlayer = Vector3.Angle(PlayerDirection, gameObject.transform.forward);
+
+
+       if(AngleToPlayer >= 175)
         {
-            Debug.Log("moving to firing phase");
             base.AttackPlayer(CurrentAttackType);
         }
 
@@ -36,6 +40,7 @@ public class GenericMovingEnemyAI : EnemyAIBase
     protected override void Start()
     {
         base.Start();
+
         _RigidBody = GetComponent<Rigidbody>();
     }
     protected override void Ranged()
@@ -62,5 +67,7 @@ public class GenericMovingEnemyAI : EnemyAIBase
         _RigidBody.MoveRotation(Quaternion.RotateTowards(transform.rotation, TargetRotation, _RotationSpeed));
 
     }
+
+   
 
 }

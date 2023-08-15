@@ -16,7 +16,7 @@ public class WeaponBehaviorBase : MonoBehaviour
     internal Rigidbody ThisRigidBody;
     //
 
-
+    
     #endregion
 
 
@@ -43,4 +43,6 @@ public class WeaponBehaviorBase : MonoBehaviour
 
         return _BaseDamage;
     }
+
+   
 }

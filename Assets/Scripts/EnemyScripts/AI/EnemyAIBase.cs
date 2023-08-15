@@ -9,12 +9,18 @@
  * 
  */
 
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyAIBase : MonoBehaviour
 {
+    #region Public Subscribable Delegates
+    public delegate void EnemyInitialized(bool bInitialized);
+    public event EnemyInitialized OnInitialized;
+
+    #endregion
 
     #region Protected Variables
 
@@ -75,7 +81,7 @@ public class EnemyAIBase : MonoBehaviour
     protected NavMeshAgent _NavAgent;
     protected GameObject _Player;
     protected Timer _Timer;
-    protected WeaponBehaviorBase _Weapon;
+    protected EnemyWeaponBehaviorBase _Weapon;
     #endregion
 
     protected int _PatrolIndex = 0;
@@ -84,7 +90,7 @@ public class EnemyAIBase : MonoBehaviour
     protected bool _bShouldPatrol;
     protected bool _bShouldAttack;
     protected bool _bPlayerVisible;
-    internal bool IsInitialized;
+    internal bool _bIsInitialized;
     //must be made public so the custom inspector can read/write this value
     public bool _bRandomDelayTime;
 
@@ -144,11 +150,14 @@ public class EnemyAIBase : MonoBehaviour
             if (collider.name == "Shoot From Location")
             {
                 _ShootFromLocation = collider;
+                _ShootFromLocation.enabled = false;
             }
         }
         //grab the weapon
-        _Weapon = _ShootFromLocation.GetComponentInChildren<WeaponBehaviorBase>(); 
-       
+        _Weapon = _ShootFromLocation.GetComponentInChildren<EnemyWeaponBehaviorBase>();
+        OnInitialized += _Weapon.OnEnemyParenInitialized;
+
+
         //grab the player
         _Player = GameObject.FindGameObjectWithTag("Player");
         _PlayerPosition = _Player.transform.position;
@@ -160,10 +169,11 @@ public class EnemyAIBase : MonoBehaviour
         //default state set
         _CurrentState = _EnemyStates.Idle;
 
-        //REQUIRED for patrol and chase behaviors
+        //REQUIRED for multiple behaviors
         _Timer = gameObject.AddComponent<Timer>();
 
-        IsInitialized = true;
+        _bIsInitialized = true;
+        OnInitialized(_bIsInitialized);
 
     }
 
@@ -380,14 +390,14 @@ public class EnemyAIBase : MonoBehaviour
 
         if(_PatrolType == _PatrolCategories.Roam)
         {
-            _PatrolIndex = Random.Range(0, _PatrolRoute._Waypoints.Count - 1);
+            _PatrolIndex = UnityEngine.Random.Range(0, _PatrolRoute._Waypoints.Count - 1);
         }
 
         float Duration = _PatrolDelay;
 
         if (_bRandomDelayTime == true) 
         {
-            Duration = Random.Range(0, _RandomDelayMaxTime);        
+            Duration = UnityEngine.Random.Range(0, _RandomDelayMaxTime);        
         }
 
         Vector3 PatrolDestination = _PatrolRoute._Waypoints[_PatrolIndex].transform.position;

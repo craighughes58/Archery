@@ -26,6 +26,7 @@ public class ArrowBehaviour : WeaponBehaviorBase
     //
     private Transform finalTransform;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,15 +53,20 @@ public class ArrowBehaviour : WeaponBehaviorBase
     {
         base.OnCollisionEnter(collision);
 
-        if(!collision.gameObject.tag.Equals("Arrow"))
+        if(!collision.gameObject.CompareTag("Arrow"))
         {
-            HasCollided = true;
-            ThisRigidBody.freezeRotation = true;
-            ThisRigidBody.useGravity = false;
+           
+            //ThisRigidBody.useGravity = false;
 
-            if (collision.gameObject.tag.Equals("Enemy"))
+            if (collision.gameObject.CompareTag("Enemy") 
+                //&& 
+              // (!gameObject.transform.parent.gameObject.CompareTag("Enemy")) 
+               )
             {
-               EnemyController HitController = collision.gameObject.GetComponent<EnemyController>();
+                HasCollided = true;
+                ThisRigidBody.freezeRotation = true;
+
+                EnemyController HitController = collision.gameObject.GetComponent<EnemyController>();
 
                 if (HitController != null) 
                 {
@@ -70,8 +76,14 @@ public class ArrowBehaviour : WeaponBehaviorBase
 
 
             }
-            else if (collision.gameObject.tag.Equals("Player"))
+            else if (collision.gameObject.CompareTag("Player") 
+                //&&
+                    //(!gameObject.transform.parent.gameObject.CompareTag("Player")) 
+                    )
             {
+                HasCollided = true;
+                ThisRigidBody.freezeRotation = true;
+
                 Health PlayerHealthSystem = collision.gameObject.GetComponent<Health>();
 
                 PlayerHealthSystem.damage(GetInflictingDamage());
@@ -95,4 +107,5 @@ public class ArrowBehaviour : WeaponBehaviorBase
     {
         return HasCollided;
     }
+
 }

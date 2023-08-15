@@ -112,5 +112,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _BaseDamage: 1
-  _ArrowPrefab: {fileID: 0}
-  _ArrowForce: 100
+  _ArrowPrefab: {fileID: 7707075399383919255, guid: 0d4b6f52296287248acbb09e0e31b292, type: 3}
+  _ArrowForce: 20
