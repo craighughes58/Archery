@@ -42,6 +42,10 @@ public class EnemyAIBase : MonoBehaviour
 
     [Tooltip("The transform location for projectile instantiation.")]
     [ReadOnly] [SerializeField] internal Collider _ShootFromLocation;
+
+    [Tooltip("The rate at which the enemy should turn to face the player.")]
+    [SerializeField] protected float _RotationSpeed = 2;
+
     #endregion
 
     #region Patrol Settings
@@ -82,6 +86,8 @@ public class EnemyAIBase : MonoBehaviour
     protected GameObject _Player;
     protected Timer _Timer;
     protected EnemyWeaponBehaviorBase _Weapon;
+    protected Rigidbody _RigidBody;
+
     #endregion
 
     protected int _PatrolIndex = 0;
@@ -89,7 +95,7 @@ public class EnemyAIBase : MonoBehaviour
     #region Booleans
     protected bool _bShouldPatrol;
     protected bool _bShouldAttack;
-    protected bool _bPlayerVisible;
+    [SerializeField]protected bool _bPlayerVisible;
     internal bool _bIsInitialized;
     //must be made public so the custom inspector can read/write this value
     public bool _bRandomDelayTime;
@@ -103,7 +109,7 @@ public class EnemyAIBase : MonoBehaviour
     protected Vector3 _PlayerCrossProduct;
     #endregion
 
-   protected _EnemyStates _CurrentState;
+  [SerializeField] protected _EnemyStates _CurrentState;
 
     #region Enums
     protected enum _EnemyStates
@@ -171,6 +177,8 @@ public class EnemyAIBase : MonoBehaviour
 
         //REQUIRED for multiple behaviors
         _Timer = gameObject.AddComponent<Timer>();
+
+        _RigidBody = GetComponent<Rigidbody>();
 
         _bIsInitialized = true;
         OnInitialized(_bIsInitialized);
@@ -504,7 +512,7 @@ public class EnemyAIBase : MonoBehaviour
             //let the chasing state revert us to idle if the player is lost
             _CurrentState = _EnemyStates.Chasing;
             _Timer.ResetTimer();
-
+            return;
 
         }
         //make another check in the case of a static enemy
@@ -516,7 +524,21 @@ public class EnemyAIBase : MonoBehaviour
         {
             _CurrentState = _EnemyStates.Idle;
             _Timer.ResetTimer();
+            return;
         }
+
+        FacePlayer();
+
+        Vector3 PlayerDirection = _EnemyPosition - _PlayerPosition;
+        float AngleToPlayer = Vector3.Angle(PlayerDirection, gameObject.transform.forward);
+
+
+        if (AngleToPlayer < 175)
+        {
+            return;
+        }
+
+
         #endregion
 
         #region Process the Enemy's Attack Type
@@ -529,7 +551,6 @@ public class EnemyAIBase : MonoBehaviour
         else if (TimeLeft <= 0)
         {
             _Timer.NewTimer(_AttackDelay);
-            Debug.Log("attacking");
             switch (CurrentAttackType)
             {
                 case _AttackCategories.Melee:
@@ -577,10 +598,7 @@ public class EnemyAIBase : MonoBehaviour
     /// <param name="collision"></param>
     protected virtual void OnCollisionEnter(Collision collision)
     {
-        #region Safety Catch If No Collider
-        if (collision.collider == null) return;
-        #endregion
-
+       
         #region Self Destruct Processing
         if (collision.collider == _Player.GetComponent<Collider>())
         {
@@ -602,5 +620,13 @@ public class EnemyAIBase : MonoBehaviour
         _PlayerPosition = _Player.transform.position;
         _bPlayerVisible = IsPlayerVisible();
     }
+    protected void FacePlayer()
+    {
+        //create new rotate closer to the player
+        Quaternion TargetRotation = Quaternion.LookRotation(_PlayerPosition - _EnemyPosition);
+        //set current rotation to new rotation
+        //Quaternion.RotateTowards(transform.rotation, TargetRotation, _RotationSpeed);
+        _RigidBody.MoveRotation(Quaternion.RotateTowards(transform.rotation, TargetRotation, _RotationSpeed));
 
+    }
 }

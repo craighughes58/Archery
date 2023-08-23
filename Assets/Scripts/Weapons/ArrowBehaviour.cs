@@ -26,6 +26,10 @@ public class ArrowBehaviour : WeaponBehaviorBase
     //
     private Transform finalTransform;
 
+    private string _ArrowOriginClass;
+
+    [SerializeField] private float _TimeToLive = 2;
+
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +50,7 @@ public class ArrowBehaviour : WeaponBehaviorBase
         else
         {
             ThisRigidBody.velocity = Vector3.zero;
+            
         }
     }
 
@@ -53,18 +58,17 @@ public class ArrowBehaviour : WeaponBehaviorBase
     {
         base.OnCollisionEnter(collision);
 
-        if(!collision.gameObject.CompareTag("Arrow"))
-        {
-           
-            //ThisRigidBody.useGravity = false;
+        HasCollided = true;
+        ThisRigidBody.freezeRotation = true;
 
-            if (collision.gameObject.CompareTag("Enemy") 
-                //&& 
-              // (!gameObject.transform.parent.gameObject.CompareTag("Enemy")) 
+        //ThisRigidBody.useGravity = false;
+
+        if (collision.gameObject.CompareTag("Enemy") 
+                && 
+               (!(_ArrowOriginClass == "Enemy")
+               && !collision.gameObject.CompareTag("Arrow")) 
                )
             {
-                HasCollided = true;
-                ThisRigidBody.freezeRotation = true;
 
                 EnemyController HitController = collision.gameObject.GetComponent<EnemyController>();
 
@@ -76,22 +80,22 @@ public class ArrowBehaviour : WeaponBehaviorBase
 
 
             }
-            else if (collision.gameObject.CompareTag("Player") 
-                //&&
-                    //(!gameObject.transform.parent.gameObject.CompareTag("Player")) 
+            else if (collision.gameObject.CompareTag("Player")
+                     &&
+                     (!!(_ArrowOriginClass == "Player")
+                     && !collision.gameObject.CompareTag("Arrow")) 
                     )
             {
-                HasCollided = true;
-                ThisRigidBody.freezeRotation = true;
-
                 Health PlayerHealthSystem = collision.gameObject.GetComponent<Health>();
 
                 PlayerHealthSystem.damage(GetInflictingDamage());
 
             }
+        if (arrowType == 0)
+        {
+            StartCoroutine(DestroyCountdown());
 
         }
-        
 
     }
 
@@ -108,4 +112,28 @@ public class ArrowBehaviour : WeaponBehaviorBase
         return HasCollided;
     }
 
+    internal void SetArrowOriginClass(string OriginClass)
+    {
+        _ArrowOriginClass = OriginClass;
+    }
+
+    internal string GetArrowOriginClass()
+    {
+        return _ArrowOriginClass;
+    }
+
+    internal IEnumerator DestroyCountdown()
+    {
+        while (_TimeToLive > 0)
+        {
+            if ((_TimeToLive -= Time.deltaTime) < 0)
+            {
+                _TimeToLive = 0;
+            }
+            else _TimeToLive -= Time.deltaTime;
+            yield return new WaitForSeconds(Time.deltaTime);
+
+        }
+        Destroy(gameObject);
+    }
 }

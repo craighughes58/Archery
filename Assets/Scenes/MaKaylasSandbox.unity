@@ -1274,6 +1274,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3772026160336216194, guid: 5ed5a811889664449a9c465f86b595b5, type: 3}
+      propertyPath: _AttackDelay
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3772026160336216194, guid: 5ed5a811889664449a9c465f86b595b5, type: 3}
       propertyPath: _RotationSpeed
       value: 5
       objectReference: {fileID: 0}
@@ -1284,6 +1288,14 @@ PrefabInstance:
     - target: {fileID: 3772026160336216194, guid: 5ed5a811889664449a9c465f86b595b5, type: 3}
       propertyPath: _RangedPerceptionDistance
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3772026160336216195, guid: 5ed5a811889664449a9c465f86b595b5, type: 3}
+      propertyPath: speed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3772026160336216211, guid: 5ed5a811889664449a9c465f86b595b5, type: 3}
+      propertyPath: m_Interpolate
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3772026160336216217, guid: 5ed5a811889664449a9c465f86b595b5, type: 3}
       propertyPath: m_Name

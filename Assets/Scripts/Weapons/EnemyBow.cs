@@ -8,13 +8,16 @@ public class EnemyBow : EnemyWeaponBehaviorBase
     [SerializeField] protected GameObject _ArrowPrefab;
     protected GameObject _CurrentArrow;
     [SerializeField] protected float _ArrowForce;
-    protected int _ArrowNum;
+    protected int _ArrowNum = 0;
+    [Tooltip("Dictates the initial upward aim of the arrow.")]
+    [SerializeField] protected float _YOffset = 0.75f;
+
 
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        GetComponent<Collider>().enabled = false;
     }
 
     // Update is called once per frame
@@ -25,10 +28,14 @@ public class EnemyBow : EnemyWeaponBehaviorBase
 
     public virtual void Fire()
     {
-        _CurrentArrow = Instantiate(_ArrowPrefab, _EnemyAI._ShootFromLocation.transform.position, _EnemyAI._ShootFromLocation.transform.rotation);
-        _CurrentArrow.transform.SetParent(_EnemyAI.transform, true);
+        _CurrentArrow = Instantiate(_ArrowPrefab, 
+            _EnemyAI._ShootFromLocation.transform.position, 
+            _EnemyAI._ShootFromLocation.transform.rotation
+            );
+        ArrowBehaviour ArrowBehaviour = _CurrentArrow.GetComponent<ArrowBehaviour>();
+        ArrowBehaviour.SetArrowOriginClass("Enemy");
+        ArrowBehaviour.setArrowType(_ArrowNum);
         _CurrentArrow.GetComponent<Rigidbody>().velocity = _EnemyAI._ShootFromLocation.transform.forward * (_ArrowForce);
-        _CurrentArrow.GetComponent<ArrowBehaviour>().setArrowType(_ArrowNum);
 
 
     }
