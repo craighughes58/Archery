@@ -625,7 +625,9 @@ public class EnemyAIBase : MonoBehaviour
         //create new rotate closer to the player
         Quaternion TargetRotation = Quaternion.LookRotation(_PlayerPosition - _EnemyPosition);
         //set current rotation to new rotation
-        //Quaternion.RotateTowards(transform.rotation, TargetRotation, _RotationSpeed);
+        Debug.Log("step into unity api");
+        Quaternion.RotateTowards(transform.rotation, TargetRotation, _RotationSpeed);
+
         _RigidBody.MoveRotation(Quaternion.RotateTowards(transform.rotation, TargetRotation, _RotationSpeed));
 
     }
